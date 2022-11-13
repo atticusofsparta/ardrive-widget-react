@@ -1,11 +1,5 @@
-
 function App() {
-
-  return (
-    <div className="widget">
-      
-    </div>
-  );
+  return <div className="widget"></div>;
 }
 
 export default App;
