@@ -8,6 +8,10 @@ function SearchBar({
   searchType: string;
   isSearching: boolean;
 }) {
+
+
+
+
   return (
     <div className="searchBarContainer">
       <input type="text" placeholder={`Enter ${searchType} ID`} />
@@ -17,7 +21,7 @@ function SearchBar({
         </button>
       ) : (
         <button className="hollowButton" style={{ border: 'none' }}>
-          <SearchIcon width="30px" hieght="30px" fill="black" />
+          <SearchIcon width="30px" height="30px" fill="black" />
         </button>
       )}
     </div>
