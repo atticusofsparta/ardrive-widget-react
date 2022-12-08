@@ -1,15 +1,22 @@
 import { Dispatch, SetStateAction } from 'react';
 
-import { BookIcon, DatabaseIcon, EyesOffIcon, FilesIcon } from '../../icons';
+import {
+  BookIcon,
+  DatabaseImportIcon,
+  EyesOffIcon,
+  FilesIcon,
+} from '../../icons';
 import './styles.css';
 
 function Menu({
   hideWidget,
   setHideWidget,
   setShowMenu,
+  view,
   setView,
 }: {
   setShowMenu: Dispatch<SetStateAction<boolean>>;
+  view: string;
   setView: Dispatch<SetStateAction<string>>;
   hideWidget: boolean;
   setHideWidget: Dispatch<SetStateAction<boolean>>;
@@ -19,12 +26,14 @@ function Menu({
       <button
         className="menuItem"
         onClick={() => {
-          setView('search');
+          if (view !== 'search') {
+            setView('search');
+          }
           setShowMenu(false);
         }}
       >
         <div className="flex-row gap1 left">
-          <DatabaseIcon width={'40px'} height={'40px'} />
+          <DatabaseImportIcon width={'40px'} height={'40px'} />
           <div className="flex-column gap left">
             <span className="textMedium">Import</span>
             <span className="textSmall faded">
@@ -37,7 +46,9 @@ function Menu({
       <button
         className="menuItem"
         onClick={() => {
-          setView('files');
+          if (view !== 'files') {
+            setView('files');
+          }
           setShowMenu(false);
         }}
       >

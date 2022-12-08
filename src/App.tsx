@@ -33,6 +33,7 @@ function App() {
                 setHideWidget={setHideWidget}
                 setShowMenu={setShowMenu}
                 setView={setView}
+                view={view}
               />
             ) : (
               <></>
