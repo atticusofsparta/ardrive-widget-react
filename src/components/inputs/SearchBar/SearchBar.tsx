@@ -8,10 +8,6 @@ function SearchBar({
   searchType: string;
   isSearching: boolean;
 }) {
-
-
-
-
   return (
     <div className="searchBarContainer">
       <input type="text" placeholder={`Enter ${searchType} ID`} />
