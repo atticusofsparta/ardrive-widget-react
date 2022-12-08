@@ -1,0 +1,29 @@
+.menu {
+  box-sizing: border-box;
+  display: flex;
+  z-index: 10;
+  position: absolute;
+  width: 100%;
+  background: #1f1f1f;
+}
+.menuItem {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  height: 75px;
+  background: #1f1f1f;
+  box-shadow: 0px 0px 1px #0d0d0d, 0px 8px 16px rgba(13, 13, 13, 0.9);
+  border-radius: 10px;
+  border: none;
+  padding-left: 1em;
+  color: var(--text-white);
+  fill: var(--text-white);
+  cursor: pointer;
+}
+.menuItem:hover {
+  background-color: var(--text-white);
+  color: var(--text-black);
+  fill: var(--text-black);
+}
