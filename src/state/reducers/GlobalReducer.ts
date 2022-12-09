@@ -31,7 +31,7 @@ export const reducer = (state: GlobalState, action: Action): GlobalState => {
         ...state,
         driveID: action.payload,
       };
-      case 'setDrive':
+    case 'setDrive':
       return {
         ...state,
         drive: action.payload,
