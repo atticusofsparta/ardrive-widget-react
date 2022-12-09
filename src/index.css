@@ -78,7 +78,7 @@
   text-align: right;
 }
 .space-between {
-  justify-content: space-between;
+  justify-content: space-between !important;
 }
 .gap {
   gap: 0.5em;

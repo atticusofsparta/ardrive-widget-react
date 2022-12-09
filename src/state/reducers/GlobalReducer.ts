@@ -1,3 +1,4 @@
+import { DriveStructure } from '../../types';
 import { GlobalState } from '../contexts/GlobalState';
 
 export type Action =
@@ -5,6 +6,7 @@ export type Action =
   | { type: 'setGateway'; payload: string }
   | { type: 'setIsSearching'; payload: boolean }
   | { type: 'setDriveID'; payload: string }
+  | { type: 'setDrive'; payload: DriveStructure }
   | { type: 'setErrors'; payload: Array<Error> };
 
 export const reducer = (state: GlobalState, action: Action): GlobalState => {
@@ -28,6 +30,11 @@ export const reducer = (state: GlobalState, action: Action): GlobalState => {
       return {
         ...state,
         driveID: action.payload,
+      };
+      case 'setDrive':
+      return {
+        ...state,
+        drive: action.payload,
       };
     case 'setErrors':
       return {
