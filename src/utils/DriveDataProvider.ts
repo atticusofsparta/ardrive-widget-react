@@ -1,6 +1,6 @@
 import { ArFSDataProvider } from '../types';
 
-export class DriveDataProvider {
+export class DriveDataProvider implements ArFSDataProvider {
   constructor({
     driveID,
     walletAddress,
