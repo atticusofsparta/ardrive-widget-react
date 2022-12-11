@@ -8,7 +8,7 @@ import CircleProgressBar from '../../progress/CircleProgressBar/CircleProgressBa
 import './styles.css';
 
 function SearchBar() {
-  const [{ isSearching, searchType, searchQuery, drive }, dispatchGlobalState] =
+  const [{ isSearching, searchType, drive }, dispatchGlobalState] =
     useGlobalState();
   const [searchBarText, setSearchBarText] = useState('');
   const [isSearchValid, setIsSearchValid] = useState<boolean | null>(null);
