@@ -8,7 +8,8 @@ import CircleProgressBar from '../../progress/CircleProgressBar/CircleProgressBa
 import './styles.css';
 
 function SearchBar() {
-  const [{ isSearching, searchType }, dispatchGlobalState] = useGlobalState();
+  const [{ isSearching, searchType, searchQuery, drive }, dispatchGlobalState] =
+    useGlobalState();
   const [searchBarText, setSearchBarText] = useState('');
   const [isSearchValid, setIsSearchValid] = useState<boolean | null>(null);
   const arfsClient = new ArFSClient();
@@ -19,6 +20,10 @@ function SearchBar() {
     dispatchGlobalState({
       type: 'setIsSearching',
       payload: false,
+    });
+    dispatchGlobalState({
+      type: 'setSearchType',
+      payload: undefined,
     });
   }
 
@@ -38,7 +43,7 @@ function SearchBar() {
       payload: false,
     });
   }
-  function onSubmit(e: any) {
+  async function onSubmit(e: any) {
     e.preventDefault();
 
     if (searchBarText === '') {
@@ -55,9 +60,30 @@ function SearchBar() {
             type: 'setIsSearching',
             payload: true,
           });
+          dispatchGlobalState({
+            type: 'setSearchQuery',
+            payload: searchBarText,
+          });
+          if (searchType == undefined) {
+            // if search type not set by the user, find the entity type
+            const newSearchType = await getEntityType(searchBarText);
+            console.log(newSearchType);
+            if (
+              newSearchType === 'drive' ||
+              newSearchType === 'folder' ||
+              newSearchType === 'file'
+            ) {
+              dispatchGlobalState({
+                type: 'setSearchType',
+                payload: newSearchType,
+              });
+            }
+          }
 
-          getEntityType(searchBarText);
-
+          dispatchGlobalState({
+            type: 'setIsSearching',
+            payload: false,
+          });
           break;
         case 'arweaveWalletAddress':
           setIsSearchValid(true);
@@ -95,8 +121,13 @@ function SearchBar() {
       if (ARFS_ID_REGEX.test(props) === false) {
         throw Error('must be an arfs id');
       }
-      const entity = arfsClient.getUnknownEntityTransactions(props);
-      console.log(entity);
+      const manifest = await arfsClient.getUnknownEntityTransactions(props);
+      const entityType = manifest[0].node.tags['Entity-Type'];
+      dispatchGlobalState({
+        type: 'setDriveOwner',
+        payload: manifest[0].node.owner.address,
+      });
+      return entityType;
     } catch (error) {
       console.error(error);
       return undefined;
@@ -119,7 +150,9 @@ function SearchBar() {
     >
       <input
         type="text"
-        placeholder={`Enter ${searchType} ID`}
+        placeholder={`Enter${searchType ? searchType : ' '}ID ${
+          drive ? 'or file name' : ''
+        }`}
         value={searchBarText}
         onChange={(e) => handleChange(e)}
         onKeyDown={(e) => (e.key === 'Enter' ? onSubmit(e) : null)}

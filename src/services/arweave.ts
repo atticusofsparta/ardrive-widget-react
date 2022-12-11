@@ -50,16 +50,15 @@ export class ArFSClient implements ArFSClient {
   async getUnknownEntityTransactions(id: string) {
     if (ARFS_ID_REGEX.test(id) === false) {
       // uuid validation
+      console.log('is not arfs id');
       return;
     }
-
     try {
       const drivequery = entityQuery({
         id: id,
         entityType: 'Drive-Id',
         modifiers: { first: 1, sort: 'HEIGHT_ASC' },
       });
-      console.log(drivequery);
       const folderquery = entityQuery({
         id: id,
         entityType: 'Folder-Id',
@@ -67,31 +66,29 @@ export class ArFSClient implements ArFSClient {
       });
       const filequery = entityQuery({
         id: id,
-        entityType: 'Folder-Id',
+        entityType: 'File-Id',
         modifiers: { first: 1, sort: 'HEIGHT_ASC' },
       });
-      if (drivequery == undefined) {
-        throw Error('drive query was not defined');
+      if (filequery == undefined) {
+        throw Error('file query was not defined');
       }
 
-      const driveresults = await arweave.api.post('/graphql', drivequery, {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-      if (driveresults.data.data.transactions.edges) {
-        driveresults.data.data.transactions.edges.map((txn: GqlTransaction) => {
+      const fileresults = await arweave.api.post('/graphql', filequery);
+
+      if (fileresults.data.data?.transactions?.edges?.length > 0) {
+        fileresults.data.data.transactions.edges.map((txn: GqlTransaction) => {
           txn.node.tags = this.tagsToObject({ tags: txn.node.tags });
           txn.node.tags['Unix-Time'] = new Number(
             txn.node.tags['Unix-Time'],
           ).valueOf();
         });
-
-        const manifests = driveresults.data.data.transactions.edges.sort(
+        const manifests = fileresults.data.data.transactions.edges.sort(
           (a: any, b: any) =>
             a.node.tags['timestamp'] - b.node.tags['timestamp'],
         );
-        return manifests;
+        const fileEntityResult = manifests;
+        console.log('file entity');
+        return fileEntityResult;
       }
 
       if (folderquery == undefined) {
@@ -99,7 +96,31 @@ export class ArFSClient implements ArFSClient {
       }
 
       const folderresults = await arweave.api.post('/graphql', folderquery);
-      if (folderresults.data.data.transactions.edges) {
+      if (folderresults.data.data?.transactions?.edges.length > 0) {
+        folderresults.data.data.transactions.edges.map(
+          (txn: GqlTransaction) => {
+            txn.node.tags = this.tagsToObject({ tags: txn.node.tags });
+            txn.node.tags['Unix-Time'] = new Number(
+              txn.node.tags['Unix-Time'],
+            ).valueOf();
+          },
+        );
+
+        const manifests = folderresults.data.data.transactions.edges.sort(
+          (a: any, b: any) =>
+            a.node.tags['timestamp'] - b.node.tags['timestamp'],
+        );
+        console.log('folder entity');
+
+        return manifests;
+      }
+
+      if (drivequery == undefined) {
+        throw Error('drive query was not defined');
+      }
+
+      const driveresults = await arweave.api.post('/graphql', drivequery);
+      if (driveresults.data.data?.transactions?.edges.length > 0) {
         driveresults.data.data.transactions.edges.map((txn: GqlTransaction) => {
           txn.node.tags = this.tagsToObject({ tags: txn.node.tags });
           txn.node.tags['Unix-Time'] = new Number(
@@ -111,29 +132,12 @@ export class ArFSClient implements ArFSClient {
           (a: any, b: any) =>
             a.node.tags['timestamp'] - b.node.tags['timestamp'],
         );
-        return manifests;
-      }
+        console.log('drive entity');
 
-      if (filequery == undefined) {
-        throw Error('file query was not defined');
-      }
-
-      const fileresults = await arweave.api.post('/graphql', filequery);
-      if (fileresults.data.data.transactions.edges) {
-        fileresults.data.data.transactions.edges.map((txn: GqlTransaction) => {
-          txn.node.tags = this.tagsToObject({ tags: txn.node.tags });
-          txn.node.tags['Unix-Time'] = new Number(
-            txn.node.tags['Unix-Time'],
-          ).valueOf();
-        });
-
-        const manifests = driveresults.data.data.transactions.edges.sort(
-          (a: any, b: any) =>
-            a.node.tags['timestamp'] - b.node.tags['timestamp'],
-        );
         return manifests;
       }
     } catch (error) {
+      console.log('it no worky');
       console.error(error);
     }
   }
@@ -219,8 +223,11 @@ export const buildQuery = ({
 }) => {
   const queryObject = {
     query: `{
-      transactions(first:${modifiers?.first},sort:${modifiers?.sort},
-        tags: ${tags}
+      transactions(first:${modifiers?.first},sort:${modifiers?.sort}
+        tags: [{
+            name: "${tags[0].name}",
+            values: ["${tags[0].values[0]}"]
+        }]
       ) {
         edges {
           node {

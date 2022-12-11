@@ -10,6 +10,7 @@ export type GlobalState = {
   isSearching: boolean;
   searchQuery?: string; // arfsId, arweaveId, or name of a file. Can only search for file names on attached drives.
   searchType?: string;
+  driveOwner?: string;
   drive?: DriveStructure; // attached drive - can only attach one at a time.
   errors: Array<Error>;
 };
@@ -20,7 +21,8 @@ const initialState: GlobalState = {
   driveIDs: undefined,
   isSearching: false,
   searchQuery: '',
-  searchType: 'Drive',
+  searchType: undefined,
+  driveOwner: undefined,
   errors: [],
 };
 
