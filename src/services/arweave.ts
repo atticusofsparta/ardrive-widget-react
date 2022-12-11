@@ -11,7 +11,7 @@ import { ARFS_ID_REGEX } from '../utils/constants';
 export const arweave = Arweave.init({
   host: 'arweave.net',
   port: 443,
-  protocol: 'http',
+  protocol: 'https',
 });
 
 export class ArFSClient implements ArFSClient {
