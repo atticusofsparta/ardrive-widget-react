@@ -15,7 +15,7 @@ function Search() {
             File Import
           </button>
         </div>
-        <SearchBar searchType="Drive" isSearching={true} />
+        <SearchBar />
         <button className="hollowButton buttonLarge white textLarge">
           View Drive
         </button>
