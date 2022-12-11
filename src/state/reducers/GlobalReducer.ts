@@ -5,7 +5,9 @@ export type Action =
   | { type: 'setWalletAddress'; payload: string }
   | { type: 'setGateway'; payload: string }
   | { type: 'setIsSearching'; payload: boolean }
-  | { type: 'setDriveID'; payload: string }
+  | { type: 'setSearchQuery'; payload: string }
+  | { type: 'setSearchType'; payload: string }
+  | { type: 'setDriveIDs'; payload: string[] }
   | { type: 'setDrive'; payload: DriveStructure }
   | { type: 'setErrors'; payload: Array<Error> };
 
@@ -26,10 +28,20 @@ export const reducer = (state: GlobalState, action: Action): GlobalState => {
         ...state,
         isSearching: action.payload,
       };
-    case 'setDriveID':
+    case 'setSearchQuery':
       return {
         ...state,
-        driveID: action.payload,
+        searchQuery: action.payload,
+      };
+    case 'setSearchType':
+      return {
+        ...state,
+        searchType: action.payload,
+      };
+    case 'setDriveIDs':
+      return {
+        ...state,
+        driveIDs: action.payload,
       };
     case 'setDrive':
       return {

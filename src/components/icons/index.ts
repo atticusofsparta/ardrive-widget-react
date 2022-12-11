@@ -23,6 +23,7 @@ import { ReactComponent as MenuIcon } from './Menu.svg';
 import { ReactComponent as MovieIcon } from './Movie.svg';
 import { ReactComponent as NoteIcon } from './Note.svg';
 import { ReactComponent as PantoneIcon } from './Pantone.svg';
+import { ReactComponent as ProgressCircleQuarter } from './ProgressCircleQuarter.svg';
 import { ReactComponent as SearchIcon } from './Search.svg';
 import { ReactComponent as SettingsIcon } from './Settings.svg';
 import { ReactComponent as VideoIcon } from './Video.svg';
@@ -56,4 +57,5 @@ export {
   MenuIcon,
   SearchIcon,
   CloseIcon,
+  ProgressCircleQuarter,
 };

@@ -4,19 +4,23 @@ import { DriveStructure } from '../../types';
 import type { Action } from '../reducers/GlobalReducer';
 
 export type GlobalState = {
-  gateway: string;
-  walletAddress?: string;
-  driveID?: string;
+  gateway: string; // arweave gateway
+  walletAddress?: string; // connected wallet (only passed down from parent app)
+  driveIDs?: string[]; // drives that have been attached to this widget or are owned by connected wallet
   isSearching: boolean;
-  drive?: DriveStructure;
+  searchQuery?: string; // arfsId, arweaveId, or name of a file. Can only search for file names on attached drives.
+  searchType?: string;
+  drive?: DriveStructure; // attached drive - can only attach one at a time.
   errors: Array<Error>;
 };
 
 const initialState: GlobalState = {
   gateway: 'arweave.net',
   walletAddress: undefined,
-  driveID: undefined,
+  driveIDs: undefined,
   isSearching: false,
+  searchQuery: '',
+  searchType: 'Drive',
   errors: [],
 };
 
@@ -39,6 +43,7 @@ export default function GlobalStateProvider({
   children,
 }: StateProviderProps): JSX.Element {
   const [state, dispatchGlobalState] = useReducer(reducer, initialState);
+
   return (
     <GlobalStateContext.Provider value={[state, dispatchGlobalState]}>
       {children}

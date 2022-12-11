@@ -6,6 +6,7 @@
   width: 100%;
   border-radius: 6px;
   background: white;
+  padding-right: 6px;
 }
 .searchBarContainer input {
   box-sizing: border-box;

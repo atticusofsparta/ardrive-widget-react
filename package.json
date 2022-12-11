@@ -14,14 +14,21 @@
     "test": "NODE_ENV=test jest"
   },
   "dependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
+    "arweave": "^1.11.8",
+    "buffer": "^6.0.3",
+    "events": "^3.3.0",
+    "process": "^0.11.10",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "util": "^0.12.5"
   },
   "devDependencies": {
     "@babel/core": "^7.19.6",
     "@babel/preset-env": "^7.19.4",
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.18.6",
+    "@esbuild-plugins/node-modules-polyfill": "^0.1.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
@@ -46,8 +53,9 @@
     "jest-transform-stub": "^2.0.0",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
+    "rollup-plugin-polyfill-node": "^0.11.0",
     "typescript": "^4.6.4",
-    "vite": "^3.1.0",
+    "vite": "^3.2.5",
     "vite-plugin-svgr": "^2.2.2"
   }
 }
