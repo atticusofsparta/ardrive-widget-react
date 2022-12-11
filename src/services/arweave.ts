@@ -169,7 +169,7 @@ export const entityQuery = ({
   modifiers?: { first?: number; sort?: 'HEIGHT_DESC' | 'HEIGHT_ASC' };
 }) => {
   switch (entityType) {
-    case 'Drive-Id':
+    case 'Drive-Id': {
       const drivetags: GqlQueryTagArray = [
         {
           name: 'Drive-Id',
@@ -181,7 +181,8 @@ export const entityQuery = ({
         modifiers: modifiers,
       });
       return drivequery;
-    case 'Folder-Id':
+    }
+    case 'Folder-Id': {
       const foldertags: GqlQueryTagArray = [
         {
           name: 'Folder-Id',
@@ -193,7 +194,8 @@ export const entityQuery = ({
         modifiers: modifiers,
       });
       return folderquery;
-    case 'File-Id':
+    }
+    case 'File-Id': {
       const filetags: GqlQueryTagArray = [
         {
           name: 'File-Id',
@@ -202,6 +204,7 @@ export const entityQuery = ({
       ];
       const filequery = buildQuery({ tags: filetags, modifiers: modifiers });
       return filequery;
+    }
     default:
       return undefined;
   }
