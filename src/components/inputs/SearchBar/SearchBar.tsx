@@ -1,33 +1,47 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { ArFSClient } from '../../../services/arweave';
-import { useGlobalState } from '../../../state/contexts/GlobalState';
-import { ARFS_ID_REGEX, ARNS_TXID_REGEX } from '../../../utils/constants';
+
 import { SearchIcon } from '../../icons';
 import CircleProgressBar from '../../progress/CircleProgressBar/CircleProgressBar';
 import './styles.css';
+import { checkSearchType } from '../../../utils/searchUtils';
+import useArweaveCompositeDataProvider from '../../../hooks/useArweaveCompositeDataProvider/useArweaveCompositeDataProvider';
+import { PrivateKeyData } from '@atticusofsparta/arfs-lite-client/types';
 
-function SearchBar() {
-  const [{ isSearching, searchType, drive }, dispatchGlobalState] =
-    useGlobalState();
+
+
+function SearchBar({
+isSearching,
+searchType,
+setSearchType,
+setSearchQuery,
+searchQuery
+}:{
+  searchType?: 'drive' | 'folder' | 'file';
+  setSearchType: (searchType?: 'drive' | 'folder' | 'file') => void;
+  isSearching: boolean;
+  setSearchQuery: (searchQuery:string) => void;
+  searchQuery?: string
+}) {
   const [searchBarText, setSearchBarText] = useState('');
   const [isSearchValid, setIsSearchValid] = useState<boolean | null>(null);
-  const arfsClient = new ArFSClient();
+
+  const arweaveDataProvider = useArweaveCompositeDataProvider({})
+
+
+  useEffect(()=>{
+    if (searchQuery){
+      setSearchBarText(searchQuery)
+    }
+  },[searchQuery])
 
   function reset() {
     setSearchBarText('');
     setIsSearchValid(null);
-    dispatchGlobalState({
-      type: 'setIsSearching',
-      payload: false,
-    });
-    dispatchGlobalState({
-      type: 'setSearchType',
-      payload: undefined,
-    });
+    setSearchType(undefined)
   }
 
-  function handleChange(e: any) {
+async  function handleChange(e: any) {
     e.preventDefault();
 
     const search = e.target.value;
@@ -38,10 +52,6 @@ function SearchBar() {
     setSearchBarText(search);
     // partially reset
     setIsSearchValid(null);
-    dispatchGlobalState({
-      type: 'setIsSearching',
-      payload: false,
-    });
   }
   async function onSubmit(e: any) {
     e.preventDefault();
@@ -50,89 +60,26 @@ function SearchBar() {
       reset();
       return;
     }
-    const searchIdType = checkSearchType(searchBarText);
-    console.log(searchIdType);
+  
+    // const searchIdType = checkSearchType(searchBarText);
+    // if (!searchIdType) {
+    //   throw Error(`Invalid search query: ${searchBarText}`);
+    // }
+ 
+    const drives = await arweaveDataProvider?._ArFSClient.getAllDrivesForAddress({address: searchBarText, privateKeyData: new PrivateKeyData({})})
+    if (!drives || drives.length === 0){
+      throw Error(`No drives found for address: ${searchBarText}`)
+    }
+  
+    console.log({drives})
     try {
-      switch (searchIdType) {
-        case 'arfsId':
-          setIsSearchValid(true);
-          dispatchGlobalState({
-            type: 'setIsSearching',
-            payload: true,
-          });
-          dispatchGlobalState({
-            type: 'setSearchQuery',
-            payload: searchBarText,
-          });
-          if (searchType == undefined) {
-            // if search type not set by the user, find the entity type
-            const newSearchType = await getEntityType(searchBarText);
-            console.log(newSearchType);
-            if (
-              newSearchType === 'drive' ||
-              newSearchType === 'folder' ||
-              newSearchType === 'file'
-            ) {
-              dispatchGlobalState({
-                type: 'setSearchType',
-                payload: newSearchType,
-              });
-            }
-          }
-
-          dispatchGlobalState({
-            type: 'setIsSearching',
-            payload: false,
-          });
-          break;
-        case 'arweaveWalletAddress':
-          setIsSearchValid(true);
-          dispatchGlobalState({
-            type: 'setIsSearching',
-            payload: true,
-          });
-          break;
-        case 'fileName':
-          setIsSearchValid(true);
-          dispatchGlobalState({
-            type: 'setIsSearching',
-            payload: true,
-          });
-          break;
-        default:
-          throw Error('not a valid search type');
-      }
+      setSearchQuery(searchBarText)
+      setIsSearchValid(true);
     } catch (error) {
-      reset();
       console.log(error);
     }
   }
-  function checkSearchType(props: string) {
-    if (ARFS_ID_REGEX.test(props)) {
-      return 'arfsId';
-    }
-    if (ARNS_TXID_REGEX.test(props)) {
-      return 'arweaveWalletAddress';
-    }
-    return 'fileName';
-  }
-  async function getEntityType(props: string) {
-    try {
-      if (ARFS_ID_REGEX.test(props) === false) {
-        throw Error('must be an arfs id');
-      }
-      const manifest = await arfsClient.getUnknownEntityTransactions(props);
-      const entityType = manifest[0].node.tags['Entity-Type'];
-      dispatchGlobalState({
-        type: 'setDriveOwner',
-        payload: manifest[0].node.owner.address,
-      });
-      return entityType;
-    } catch (error) {
-      console.error(error);
-      return undefined;
-    }
-  }
+
   return (
     <div
       className="searchBarContainer"
@@ -150,12 +97,13 @@ function SearchBar() {
     >
       <input
         type="text"
-        placeholder={`Enter${searchType ? searchType : ' '}ID ${
-          drive ? 'or file name' : ''
+        placeholder={`Enter${searchType ? ` ${searchType} ` : ' '}ID ${
+          false ? 'or file name' : ''
         }`}
         value={searchBarText}
         onChange={(e) => handleChange(e)}
         onKeyDown={(e) => (e.key === 'Enter' ? onSubmit(e) : null)}
+        maxLength={43}
       />
       {isSearching ? (
         <button className="hollowButton" style={{ border: 'none' }}>

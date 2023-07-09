@@ -5,6 +5,8 @@
   position: absolute;
   width: 100%;
   background: #1f1f1f;
+  height: 100%;
+  transition: all 1.5s ease-in-out;
 }
 .menuItem {
   box-sizing: border-box;
@@ -18,12 +20,15 @@
   border-radius: 10px;
   border: none;
   padding-left: 1em;
-  color: var(--text-white);
-  fill: var(--text-white);
+  color: var(--foreground-muted);
+  fill: var(--foreground-muted);
   cursor: pointer;
+  transition: all .2s ease-in-out;
+ 
 }
 .menuItem:hover {
-  background-color: var(--text-white);
-  color: var(--text-black);
-  fill: var(--text-black);
+  background-color: var(--foreground-dark-theme);
+  color: var(--background-dark-theme);
+  fill: var(--background-dark-theme);
+  transition: all 0.2s ease-in-out;
 }

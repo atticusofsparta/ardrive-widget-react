@@ -1,13 +1,43 @@
+import {ArFSClientType} from '@atticusofsparta/arfs-lite-client';
+import Arweave from "arweave";
+
+export type Theme = {
+  primary: string,
+  secondary: string,
+  background: string,
+  foreground: string,
+  foreground_muted: string,
+  text: string,
+  text_subtle: string,
+  input_text: string,
+  input_placeholder: string,
+  success: string,
+  warning: string,
+  error: string,
+  info: string,
+  shadow: string
+}
+
+export enum SEARCH_TYPES {
+  ARFS_ID = 'arfsId',
+  ARWEAVE_WALLET_ADDRESS = 'arweaveWalletAddress',
+}
+
+export enum ENTITY_TYPES {
+ DRIVE = 'drive',
+  FOLDER = 'folder',
+  FILE = 'file',
+}
+
+
 export interface ArFSDataProvider {
-  getFiles(): Array<object>; // gql query using id and entity type (drive/folder/file)
-  buildDrive(): DriveStructure; // builds the complete drive structure for global state
+  _ArFSClient: ArFSClientType;
+  _arweave: Arweave;
+
+ // getFiles(): Array<object>; // gql query using id and entity type (drive/folder/file)
+  buildDrive(entityId:string): Promise<any>; // builds the complete drive structure for global state
 }
-export interface ArFSClient {
-  getDriveTransactions(): Promise<Array<string> | undefined>;
-  getDriveOwner(): string;
-  tagsToObject(): TagsObject;
-  cleanDriveData(): Array<GqlTransaction>;
-}
+
 
 export type GqlQueryTagArray = Array<{ name: string; values: Array<string> }>;
 export type GqlResultTagArray = [{ name: string; value: string }];
@@ -21,12 +51,13 @@ export type GqlTransaction = {
     tags: any;
   };
 };
-export type DriveStructure = {
+export type DriveStructure = { 
+  driveId: string;
   rootFolder: RootFolder;
   timestamp: number;
   owner: string;
   driveName: string;
-  files?: { [x: string]: File }; // ALL FILES ARE STORED AT TOP LEVEL TO BE REFERENCED BY THEIR ID
+  files?: { [x: string]: File }; // ALL FILES ARE STORED AT TOP LEVEL TO BE REFERENCED BY THEIR ID {[x: uuid]: file}
   fileCount: number;
   folderCount: number;
   size: number;
@@ -34,7 +65,8 @@ export type DriveStructure = {
 
 export type RootFolder = {
   folderId: string;
-  folders?: { [x: string]: Folder }; // FOLDER STRUCTURE
+  files?:string[];
+  folders?: { [x: string]: Folder }; // FOLDER STRUCTURE {[x: uuid]: folder}
   timestamp: number;
 };
 
@@ -50,11 +82,11 @@ export type Folder = {
   size: number; // IN BYTES
 };
 export type File = {
-  dataTansaction: string;
-  fileId: string;
-  parentFolderId: string;
-  timestamp: number;
+  dataTansaction: string; // arweave txid
+  fileId: string; // uuid
+  parentFolderId: string; // uuid
+  timestamp: number; // unit
   mime: string;
   fileName: string;
-  size: number;
+  size: number; // bytes
 };

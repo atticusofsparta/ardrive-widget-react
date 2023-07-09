@@ -27,6 +27,7 @@ function Navbar({
             borderRadius: '12px',
             height: '40px',
             width: '40px',
+            cursor: 'pointer',
           }}
         >
           <ChevronDownIcon width="30px" height="30px" fill="white" />
@@ -34,7 +35,7 @@ function Navbar({
       ) : (
         <button
           className="hollowButton"
-          style={{ border: 'none', height: '40px', width: '40px' }}
+          style={{ border: 'none', height: '40px', width: '40px', cursor: 'pointer' }}
           onClick={() => setShowMenu(!showMenu)}
         >
           {showMenu ? (

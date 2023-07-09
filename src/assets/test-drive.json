@@ -1,0 +1,73 @@
+{
+    "driveId": "3b4a5e98-12ab-4567-89cd-0123456789ef",
+    "rootFolder": {
+      "folderId": "abcdef12-34cd-5678-9abc-0123456789de",
+      "files": [
+        "01234567-89ab-cdef-0123-456789abcdef",
+        "98765432-dcba-fedc-3210-0123456789ab"
+      ],
+      "folders": {
+        "12345678-abcd-ef01-2345-6789abcdef": {
+          "parentFolderId": "abcdef12-34cd-5678-9abc-0123456789de",
+          "folderId": "12345678-abcd-ef01-2345-6789abcdef",
+          "files": [
+            "456789ab-cdef-0123-4567-89abcdef0123"
+          ],
+          "folders": {},
+          "timestamp": 1625688365000,
+          "folderName": "Subfolder 1",
+          "fileCount": 1,
+          "folderCount": 0,
+          "size": 1024
+        },
+        "98765432-dcba-fedc-3210-0123456789ab": {
+          "parentFolderId": "abcdef12-34cd-5678-9abc-0123456789de",
+          "folderId": "98765432-dcba-fedc-3210-0123456789ab",
+          "files": [],
+          "folders": {},
+          "timestamp": 1625688372000,
+          "folderName": "Subfolder 2",
+          "fileCount": 0,
+          "folderCount": 0,
+          "size": 0
+        }
+      },
+      "timestamp": 1625688350000
+    },
+    "timestamp": 1625688340000,
+    "owner": "JohnDoe123",
+    "driveName": "My Drive",
+    "files": {
+      "01234567-89ab-cdef-0123-456789abcdef": {
+        "dataTansaction": "abcd0123-4567-89ab-cdef-0123456789ef",
+        "fileId": "01234567-89ab-cdef-0123-456789abcdef",
+        "parentFolderId": "abcdef12-34cd-5678-9abc-0123456789de",
+        "timestamp": 1625688355000,
+        "mime": "text/plain",
+        "fileName": "File 1.txt",
+        "size": 512
+      },
+      "98765432-dcba-fedc-3210-0123456789ab": {
+        "dataTansaction": "efgh4567-89ab-cdef-0123-456789abcdef",
+        "fileId": "98765432-dcba-fedc-3210-0123456789ab",
+        "parentFolderId": "abcdef12-34cd-5678-9abc-0123456789de",
+        "timestamp": 1625688360000,
+        "mime": "image/jpeg",
+        "fileName": "Image.jpg",
+        "size": 2048
+      },
+      "456789ab-cdef-0123-4567-89abcdef0123": {
+        "dataTansaction": "ijkl89ab-cdef-0123-4567-89abcdef0123",
+        "fileId": "456789ab-cdef-0123-4567-89abcdef0123",
+        "parentFolderId": "12345678-abcd-ef01-2345-6789abcdef",
+        "timestamp": 1625688368000,
+        "mime": "application/pdf",
+        "fileName": "Document.pdf",
+        "size": 4096
+      }
+    },
+    "fileCount": 3,
+    "folderCount": 2,
+    "size": 8192
+  }
+  

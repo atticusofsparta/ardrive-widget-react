@@ -7,20 +7,27 @@
 }
 
 :root {
-  --bg-color: #1d1e1c;
-  --card-bg: #1f1f1f;
-  --text-black: #121212;
-  --text-faded: #9e9e9e;
-  --text-section-header: #d1d1d1;
-  --text-white: #fafafa;
-  --text-bright-white: #ffffff;
-  --placeholder-text: #d1d1d1;
-  --grey-white: #dfdfde;
-  --error-red: #df1642;
-  --success-green: #18a957;
-  --caution: #ffbb38;
-  --accent: #fe0230;
-  --modal-bg: #1f1f1f;
+  /* Common Variables */
+  --primary: #FE0230;
+  --foreground-muted: #EEEEEE;
+  --input-text: #424242;
+  --input-placeholder: #616161;
+  --success: #5DC389;
+  --warning: #F5A623;
+  --error: #DF1642;
+  --info: #3142c4;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --text-subtle: #9E9E9E;
+    /* Light Theme Variables */
+    --background-light-theme: #FFFFFF;
+    --foreground-light-theme: #FFFFFF;
+    --text-light-theme: #000000;
+    --secondary-light-theme: #171717;
+      /* Dark Theme Variables */
+  --background-dark-theme: #1F1F1F;
+  --foreground-dark-theme: #FFFFFF;
+  --text-dark-theme: #FFFFFF;
+  --secondary-dark-theme: #ffffff;
 }
 
 .widget {
@@ -31,9 +38,10 @@
   width: 512px;
   border-radius: 24px;
   padding: 56px 53px;
-  background: var(--modal-bg);
+  background: var(--background-dark-theme);
   box-shadow: 0px 0px 1px #0d0d0d, 0px 8px 16px rgba(13, 13, 13, 0.9);
   border-radius: 24px;
+  transition: all 0.2s ease-in-out;
 }
 .widget-hidden {
   box-sizing: border-box;
@@ -43,15 +51,17 @@
   width: 512px;
   border-radius: 24px;
   padding: 56px 53px;
-  background: var(--modal-bg);
+  background: var(--background-dark-theme);
   box-shadow: 0px 0px 1px #0d0d0d, 0px 8px 16px rgba(13, 13, 13, 0.9);
   border-radius: 24px;
+  transition: all 0.2s ease-in-out;
 }
 .viewContainer {
   display: flex;
   flex-direction: column;
   position: relative;
   height: 100%;
+  margin-top: 50px;
 }
 
 .flex-row {
@@ -124,18 +134,19 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  border: 1px solid var(--text-white);
+  border: 1px solid var(--foreground-muted);
   border-radius: 6px;
   background: none;
+  color: var(--foreground-muted);
 }
-.accentButton {
+.button-primary {
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   border-radius: 6px;
-  background: var(--accent);
+  background: var(--primary);
   border: none;
 }
 .buttonLarge {
@@ -149,8 +160,8 @@
   cursor: pointer;
 }
 .faded {
-  color: var(--text-faded);
+  color: var(--text-subtle);
 }
 .white {
-  color: var(--text-white);
+  color: var(--foreground-muted);
 }

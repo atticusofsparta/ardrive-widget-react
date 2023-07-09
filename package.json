@@ -14,14 +14,20 @@
     "test": "NODE_ENV=test jest"
   },
   "dependencies": {
+    "@atticusofsparta/arfs-lite-client": "file:../arfs-lite-client/dist",
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",
     "arweave": "^1.11.8",
+    "asn1.js": "^5.4.1",
     "buffer": "^6.0.3",
     "events": "^3.3.0",
     "process": "^0.11.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "util": "^0.12.5"
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "safe-buffer": "^5.2.1",
+    "safer-buffer": "^2.1.2",
+    "util": "^0.12.5",
+    "vite-plugin-node-polyfills": "^0.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.19.6",

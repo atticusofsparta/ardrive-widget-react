@@ -17,7 +17,7 @@ function Menu({
 }: {
   setShowMenu: Dispatch<SetStateAction<boolean>>;
   view: string;
-  setView: Dispatch<SetStateAction<string>>;
+  setView: Dispatch<SetStateAction<'search' | 'files' | 'drive'>>;
   hideWidget: boolean;
   setHideWidget: Dispatch<SetStateAction<boolean>>;
 }) {
