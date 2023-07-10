@@ -6,7 +6,7 @@ import CircleProgressBar from '../../progress/CircleProgressBar/CircleProgressBa
 import './styles.css';
 import { checkSearchType } from '../../../utils/searchUtils';
 import useArweaveCompositeDataProvider from '../../../hooks/useArweaveCompositeDataProvider/useArweaveCompositeDataProvider';
-import { PrivateKeyData } from '@atticusofsparta/arfs-lite-client/types';
+import { PrivateKeyData } from '@atticusofsparta/arfs-lite-client';
 
 
 
@@ -66,12 +66,16 @@ async  function handleChange(e: any) {
     //   throw Error(`Invalid search query: ${searchBarText}`);
     // }
  
-    const drives = await arweaveDataProvider?._ArFSClient.getAllDrivesForAddress({address: searchBarText, privateKeyData: new PrivateKeyData({})})
+    console.log("querying for drives")
+    const drives = await arweaveDataProvider?._ArFSClient.getAllDrivesForAddress({address: searchBarText, privateKeyData: new PrivateKeyData({})}).catch((err:any)=>{
+      console.error(err)
+    })
+    console.log(drives)
     if (!drives || drives.length === 0){
       throw Error(`No drives found for address: ${searchBarText}`)
     }
   
-    console.log({drives})
+   
     try {
       setSearchQuery(searchBarText)
       setIsSearchValid(true);
