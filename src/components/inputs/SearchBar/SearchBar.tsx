@@ -6,7 +6,7 @@ import CircleProgressBar from '../../progress/CircleProgressBar/CircleProgressBa
 import './styles.css';
 import { checkSearchType } from '../../../utils/searchUtils';
 import useArweaveCompositeDataProvider from '../../../hooks/useArweaveCompositeDataProvider/useArweaveCompositeDataProvider';
-import { PrivateKeyData } from '@atticusofsparta/arfs-lite-client';
+import { ArweaveAddress, PrivateKeyData } from '@atticusofsparta/arfs-lite-client';
 
 
 
@@ -74,6 +74,8 @@ async  function handleChange(e: any) {
     if (!drives || drives.length === 0){
       throw Error(`No drives found for address: ${searchBarText}`)
     }
+  
+
   
    
     try {
