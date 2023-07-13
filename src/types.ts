@@ -1,22 +1,30 @@
-import {ArFSClientType} from '@atticusofsparta/arfs-lite-client';
-import Arweave from "arweave";
+import {
+  ArFSPublicFile,
+  ArFSPublicFolder,
+  EntityID,
+  ArFSDriveEntity,
+  ArFSClientType
+} from '@atticusofsparta/arfs-lite-client';
+import Arweave from 'arweave';
+
+import ArFSDrive from './services/ArFSDrive';
 
 export type Theme = {
-  primary: string,
-  secondary: string,
-  background: string,
-  foreground: string,
-  foreground_muted: string,
-  text: string,
-  text_subtle: string,
-  input_text: string,
-  input_placeholder: string,
-  success: string,
-  warning: string,
-  error: string,
-  info: string,
-  shadow: string
-}
+  primary: string;
+  secondary: string;
+  background: string;
+  foreground: string;
+  foreground_muted: string;
+  text: string;
+  text_subtle: string;
+  input_text: string;
+  input_placeholder: string;
+  success: string;
+  warning: string;
+  error: string;
+  info: string;
+  shadow: string;
+};
 
 export enum SEARCH_TYPES {
   ARFS_ID = 'arfsId',
@@ -24,20 +32,18 @@ export enum SEARCH_TYPES {
 }
 
 export enum ENTITY_TYPES {
- DRIVE = 'drive',
+  DRIVE = 'drive',
   FOLDER = 'folder',
   FILE = 'file',
 }
-
 
 export interface ArFSDataProvider {
   _ArFSClient: ArFSClientType;
   _arweave: Arweave;
 
- // getFiles(): Array<object>; // gql query using id and entity type (drive/folder/file)
-  buildDrive(entityId:string): Promise<any>; // builds the complete drive structure for global state
+  buildDrive(drive: ArFSDriveEntity): Promise<ArFSDrive>; // builds the complete drive structure
+  getEntityType(entityId: EntityID): Promise<ENTITY_TYPES | undefined>; // returns the entity type of the arfs id
 }
-
 
 export type GqlQueryTagArray = Array<{ name: string; values: Array<string> }>;
 export type GqlResultTagArray = [{ name: string; value: string }];
@@ -51,35 +57,25 @@ export type GqlTransaction = {
     tags: any;
   };
 };
-export type DriveStructure = { 
-  driveId: string;
-  rootFolder: RootFolder;
-  timestamp: number;
-  owner: string;
-  driveName: string;
-  files?: { [x: string]: File }; // ALL FILES ARE STORED AT TOP LEVEL TO BE REFERENCED BY THEIR ID {[x: uuid]: file}
-  fileCount: number;
-  folderCount: number;
-  size: number;
+export type DriveStructure = {
+  details: ArFSDriveEntity;
+  root: {
+    folders: Folder[];
+    files: ArFSPublicFile[];
+  };
 };
 
 export type RootFolder = {
   folderId: string;
-  files?:string[];
+  files?: string[];
   folders?: { [x: string]: Folder }; // FOLDER STRUCTURE {[x: uuid]: folder}
   timestamp: number;
 };
 
 export type Folder = {
-  parentFolderId: string;
-  folderId: string;
-  files?: Array<string>; // ARRAY OF ARFS FILES IDS
-  folders?: { [x: string]: Folder }; // ARRAY OF ARFS FOLDER IDS
-  timestamp: number; // UNIX
-  folderName: string;
-  fileCount: number; // TOTAL COMBINED FILE COUNT IN SUB FOLDERS
-  folderCount: number; // TOTAL SUBFOLDER COUNT
-  size: number; // IN BYTES
+  files: ArFSPublicFile[];
+  folders: Folder[];
+  details: ArFSPublicFolder;
 };
 export type File = {
   dataTansaction: string; // arweave txid

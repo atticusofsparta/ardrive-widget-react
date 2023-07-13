@@ -1,47 +1,46 @@
+import {
+  ArweaveAddress,
+  PrivateKeyData,
+  EntityID
+} from '@atticusofsparta/arfs-lite-client';
 import { useEffect, useState } from 'react';
-
-
+import useArweaveCompositeDataProvider from '../../../hooks/useArweaveCompositeDataProvider/useArweaveCompositeDataProvider';
+import { checkSearchType } from '../../../utils/searchUtils';
 import { SearchIcon } from '../../icons';
 import CircleProgressBar from '../../progress/CircleProgressBar/CircleProgressBar';
 import './styles.css';
-import { checkSearchType } from '../../../utils/searchUtils';
-import useArweaveCompositeDataProvider from '../../../hooks/useArweaveCompositeDataProvider/useArweaveCompositeDataProvider';
-import { ArweaveAddress, PrivateKeyData } from '@atticusofsparta/arfs-lite-client';
-
-
 
 function SearchBar({
-isSearching,
-searchType,
-setSearchType,
-setSearchQuery,
-searchQuery
-}:{
+  isSearching,
+  searchType,
+  setSearchType,
+  setSearchQuery,
+  searchQuery,
+}: {
   searchType?: 'drive' | 'folder' | 'file';
   setSearchType: (searchType?: 'drive' | 'folder' | 'file') => void;
   isSearching: boolean;
-  setSearchQuery: (searchQuery:string) => void;
-  searchQuery?: string
+  setSearchQuery: (searchQuery: string) => void;
+  searchQuery?: string;
 }) {
   const [searchBarText, setSearchBarText] = useState('');
   const [isSearchValid, setIsSearchValid] = useState<boolean | null>(null);
 
-  const arweaveDataProvider = useArweaveCompositeDataProvider({})
+  const arweaveDataProvider = useArweaveCompositeDataProvider({});
 
-
-  useEffect(()=>{
-    if (searchQuery){
-      setSearchBarText(searchQuery)
+  useEffect(() => {
+    if (searchQuery) {
+      setSearchBarText(searchQuery);
     }
-  },[searchQuery])
+  }, [searchQuery]);
 
   function reset() {
     setSearchBarText('');
     setIsSearchValid(null);
-    setSearchType(undefined)
+    setSearchType(undefined);
   }
 
-async  function handleChange(e: any) {
+  async function handleChange(e: any) {
     e.preventDefault();
 
     const search = e.target.value;
@@ -60,26 +59,17 @@ async  function handleChange(e: any) {
       reset();
       return;
     }
-  
+
     // const searchIdType = checkSearchType(searchBarText);
     // if (!searchIdType) {
     //   throw Error(`Invalid search query: ${searchBarText}`);
     // }
- 
-    console.log("querying for drives")
-    const drives = await arweaveDataProvider?._ArFSClient.getAllDrivesForAddress({address: searchBarText, privateKeyData: new PrivateKeyData({})}).catch((err:any)=>{
-      console.error(err)
-    })
-    console.log(drives)
-    if (!drives || drives.length === 0){
-      throw Error(`No drives found for address: ${searchBarText}`)
-    }
-  
 
-  
-   
+    const entityType = await arweaveDataProvider?.getEntityType(new EntityID(searchBarText))
+    console.log(entityType)
+
     try {
-      setSearchQuery(searchBarText)
+      setSearchQuery(searchBarText);
       setIsSearchValid(true);
     } catch (error) {
       console.log(error);

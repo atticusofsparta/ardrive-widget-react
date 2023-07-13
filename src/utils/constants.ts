@@ -58,45 +58,46 @@ export const INITIAL_DRIVE_STATE: DriveStructure = {
   },
 };
 
-
-
 export const DARK_THEME = {
-  primary: "#FE0230",
-  secondary: "#FFFFFF",
-  background: "#1F1F1F",
-  foreground: "#FFFFFF",
-  foreground_muted: "#EEEEEE",
-  text: "#FFFFFF",
-  text_subtle: "9E9E9E" ,
-  input_text: "#424242",
-  input_placeholder: "#616161",
-  success: "#5DC389",
-  warning: "#F5A623",
-  error: "#DF1642",
-  info: "#3142c4",
-  shadow: "rgba(0, 0, 5px, 0.5)",
-  }
-  
-  export const LIGHT_THEME = {
-      primary: "#FE0230",
-      secondary: "#171717",
-      background: "#FFFFFF",
-      foreground: "#FFFFFF",
-      foreground_muted: "#EEEEEE",
-      text: "#FFFFFF",
-      text_subtle: "9E9E9E" ,
-      input_text: "#424242",
-      input_placeholder: "#616161",
-      success: "#5DC389",
-      warning: "#F5A623",
-      error: "#DF1642",
-      info: "#3142c4",
-      shadow: "rgba(0, 0, 5px, 0.5)",
-      }
+  primary: '#FE0230',
+  secondary: '#FFFFFF',
+  background: '#1F1F1F',
+  foreground: '#FFFFFF',
+  foreground_muted: '#EEEEEE',
+  text: '#FFFFFF',
+  text_subtle: '9E9E9E',
+  input_text: '#424242',
+  input_placeholder: '#616161',
+  success: '#5DC389',
+  warning: '#F5A623',
+  error: '#DF1642',
+  info: '#3142c4',
+  shadow: 'rgba(0, 0, 5px, 0.5)',
+};
 
+export const LIGHT_THEME = {
+  primary: '#FE0230',
+  secondary: '#171717',
+  background: '#FFFFFF',
+  foreground: '#FFFFFF',
+  foreground_muted: '#EEEEEE',
+  text: '#FFFFFF',
+  text_subtle: '9E9E9E',
+  input_text: '#424242',
+  input_placeholder: '#616161',
+  success: '#5DC389',
+  warning: '#F5A623',
+  error: '#DF1642',
+  info: '#3142c4',
+  shadow: 'rgba(0, 0, 5px, 0.5)',
+};
 
-      export function tagsToObject({ tags }: { tags: GqlResultTagArray }): TagsObject {
-        const tagObject: { [x: string]: string } = {};
-        tags.map((tag) => (tagObject[tag.name] = tag.value));
-        return tagObject;
-      }
+export function tagsToObject({
+  tags,
+}: {
+  tags: GqlResultTagArray;
+}): TagsObject {
+  const tagObject: { [x: string]: string } = {};
+  tags.map((tag) => (tagObject[tag.name] = tag.value));
+  return tagObject;
+}

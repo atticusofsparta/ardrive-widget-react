@@ -23,8 +23,7 @@
   color: var(--foreground-muted);
   fill: var(--foreground-muted);
   cursor: pointer;
-  transition: all .2s ease-in-out;
- 
+  transition: all 0.2s ease-in-out;
 }
 .menuItem:hover {
   background-color: var(--foreground-dark-theme);

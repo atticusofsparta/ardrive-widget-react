@@ -35,7 +35,12 @@ function Navbar({
       ) : (
         <button
           className="hollowButton"
-          style={{ border: 'none', height: '40px', width: '40px', cursor: 'pointer' }}
+          style={{
+            border: 'none',
+            height: '40px',
+            width: '40px',
+            cursor: 'pointer',
+          }}
           onClick={() => setShowMenu(!showMenu)}
         >
           {showMenu ? (

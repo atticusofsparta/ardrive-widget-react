@@ -1,8 +1,4 @@
-
-import {
-  GqlQueryTagArray
-} from '../types';
-
+import { GqlQueryTagArray } from '../types';
 
 export const entityQuery = ({
   id,
@@ -50,7 +46,7 @@ export const entityQuery = ({
       const filequery = buildQuery({ tags: filetags, modifiers: modifiers });
       return filequery;
     }
-    default:{
+    default: {
       const drivetags: GqlQueryTagArray = [
         {
           name: 'Drive-Id',
@@ -75,7 +71,9 @@ export const buildQuery = ({
 }) => {
   const queryObject = {
     query: `{
-      transactions(first:${modifiers?.first ?? 100},sort:${modifiers?.sort ?? 'HEIGHT_DESC'}
+      transactions(first:${modifiers?.first ?? 100},sort:${
+      modifiers?.sort ?? 'HEIGHT_DESC'
+    }
         tags: [{
             name: "${tags[0].name}",
             values: ["${tags[0].values[0]}"]

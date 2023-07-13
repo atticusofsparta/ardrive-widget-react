@@ -1,33 +1,39 @@
-import {useState, useEffect} from "react";
-import Arweave from "arweave";
-import ArweaveCompositeDataProvider from "../../services/ArweaveCompositeDataProvider";
-import { ArFSClient } from "@atticusofsparta/arfs-lite-client";
+import { ArFSClient } from '@atticusofsparta/arfs-lite-client';
+import Arweave from 'arweave';
+import { useEffect, useState } from 'react';
 
-function useArweaveCompositeDataProvider ({customArweave}:{customArweave?:Arweave}) {
+import ArweaveCompositeDataProvider from '../../services/ArweaveCompositeDataProvider';
 
-    const [dataProvider, setDataProvider] = useState<ArweaveCompositeDataProvider | undefined>(undefined);
+function useArweaveCompositeDataProvider({
+  customArweave,
+}: {
+  customArweave?: Arweave;
+}) {
+  const [dataProvider, setDataProvider] = useState<
+    ArweaveCompositeDataProvider | undefined
+  >(undefined);
 
-useEffect(()=> {
-
-try {
-        const arweave = customArweave ?? Arweave.init({
-            host: "arweave.net",
-            port: 443,
-            protocol: "https",
+  useEffect(() => {
+    try {
+      const arweave =
+        Arweave.init({
+          host: 'arweave.net',
+          port: 443,
+          protocol: 'https',
         });
-        const arFSClient = new ArFSClient(arweave);
+      const arFSClient = new ArFSClient(arweave);
 
-        const arweaveCompositeDataProvider = new ArweaveCompositeDataProvider({arweave:customArweave, arFSClient});
-        setDataProvider(arweaveCompositeDataProvider);
-} catch (error) {
-    console.error(error)
-}   
+      const arweaveCompositeDataProvider = new ArweaveCompositeDataProvider({
+        arweave: customArweave ?? arweave,
+        arFSClient,
+      });
+      setDataProvider(arweaveCompositeDataProvider);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [customArweave]);
 
-},[customArweave])
-
-
-    return dataProvider
-
+  return dataProvider;
 }
 
 export default useArweaveCompositeDataProvider;

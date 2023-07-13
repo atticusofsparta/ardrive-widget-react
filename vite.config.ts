@@ -5,18 +5,21 @@ import svgr from 'vite-plugin-svgr';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-
-  plugins: [svgr(), react(), nodePolyfills({
-    protocolImports: true,
-  }), ],
+  plugins: [
+    svgr(),
+    react(),
+    nodePolyfills({
+      protocolImports: true,
+    }),
+  ],
   // TODO: remove this when no longer deploying to GH pages
-  optimizeDeps:{
-    //exclude:['@atticusofsparta/arfs-lite-client'],
-    esbuildOptions:{
-      define:{
-        global:'globalThis',
-      }
-    }
+  optimizeDeps: {
+   // exclude:['@atticusofsparta/arfs-lite-client'],
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+    },
   },
   base: '/ardrive-widget-react/',
 
@@ -29,8 +32,8 @@ export default defineConfig({
     },
   },
   server: {
-    fs:{
+    fs: {
       allow: ['..'],
-    }
+    },
   },
 });

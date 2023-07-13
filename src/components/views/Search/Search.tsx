@@ -1,28 +1,16 @@
-import {useState, useEffect} from 'react'
-import SearchBar from '../../inputs/SearchBar/SearchBar';
+import { useEffect, useState } from 'react';
+
 import { DriveStructure } from '../../../types';
+import SearchBar from '../../inputs/SearchBar/SearchBar';
 
-function Search({
+function Search({}: {}) {
+  const [searchType, setSearchType] = useState<'drive' | 'folder' | 'file'>();
+  const [searchQuery, setSearchQuery] = useState<string>();
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
-}:{
-
-}) {
-
-  const [searchType, setSearchType] = useState<'drive' | 'folder' | 'file'>()
-  const [searchQuery, setSearchQuery] = useState<string>()
-  const [isSearching, setIsSearching] = useState<boolean>(false)
-
-  useEffect(()=>{
-    console.log(searchType, searchQuery, isSearching)
-  },[searchType, searchQuery, isSearching])
-
-
-
-
-
-
-
-
+  useEffect(() => {
+    console.log(searchType, searchQuery, isSearching);
+  }, [searchType, searchQuery, isSearching]);
 
   return (
     <div className="flex-column space-between" style={{ height: '100%' }}>
@@ -39,11 +27,11 @@ function Search({
           </button>
         </div>
         <SearchBar
-        isSearching={isSearching}
-        searchType={searchType}
-        setSearchType={setSearchType}
-        setSearchQuery={setSearchQuery}
-        searchQuery={searchQuery}
+          isSearching={isSearching}
+          searchType={searchType}
+          setSearchType={setSearchType}
+          setSearchQuery={setSearchQuery}
+          searchQuery={searchQuery}
         />
         <button className="hollowButton buttonLarge white textLarge">
           View Drive
