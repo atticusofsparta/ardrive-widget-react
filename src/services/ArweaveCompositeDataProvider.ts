@@ -1,4 +1,8 @@
-import { ArFSClientType, EntityID, ArFSDriveEntity } from '@atticusofsparta/arfs-lite-client';
+import {
+  ArFSClientType,
+  ArFSDriveEntity,
+  EntityID,
+} from '@atticusofsparta/arfs-lite-client';
 import Arweave from 'arweave';
 
 import { ArFSDataProvider, ENTITY_TYPES } from '../types';
@@ -35,33 +39,34 @@ class ArweaveCompositeDataProvider implements ArFSDataProvider {
     return new ArFSDrive(drive, folders, files);
   }
 
-  async getEntityType(entityId: EntityID): Promise<ENTITY_TYPES | undefined> {
-    
+  async getEntityType(
+    entityId: EntityID,
+  ): Promise<{ type: ENTITY_TYPES; owner: string } | undefined> {
     const ids = ['Drive-Id', 'Folder-Id', 'File-Id'];
     const queries = ids.map((entityType) =>
-      entityQuery({ id: entityId.toString(), entityType, modifiers: { first: 1 } }),
+      entityQuery({
+        id: entityId.toString(),
+        entityType,
+        modifiers: { first: 1 },
+      }),
     );
 
     const [driveRes, folderRes, fileRes] = await Promise.all(
-      queries.map((query, index) =>
+      queries.map((query) =>
         this._arweave.api
           .post('/graphql', query)
-          .then((res) =>
-            res.data.data.transactions.edges[0]?.node?.tags?.find(
-              (t:any) => t.name === ids[index],
-            ),
-          ),
+          .then((res) => res.data.data.transactions.edges[0]?.node),
       ),
     );
 
-    if (driveRes) {
-      return ENTITY_TYPES.DRIVE;
+    if (folderRes?.tags?.find((t: any) => t.name === 'Folder-Id')) {
+      return { type: ENTITY_TYPES.FOLDER, owner: folderRes.owner.address };
     }
-    if (folderRes) {
-      return ENTITY_TYPES.FOLDER;
+    if (fileRes?.tags?.find((t: any) => t.name === 'File-Id')) {
+      return { type: ENTITY_TYPES.FILE, owner: fileRes.owner.address };
     }
-    if (fileRes) {
-      return ENTITY_TYPES.FILE;
+    if (driveRes?.tags?.find((t: any) => t.name === 'Drive-Id')) {
+      return { type: ENTITY_TYPES.DRIVE, owner: driveRes.owner.address };
     }
   }
 }

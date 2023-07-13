@@ -1,9 +1,9 @@
 import {
+  ArFSClientType,
+  ArFSDriveEntity,
   ArFSPublicFile,
   ArFSPublicFolder,
   EntityID,
-  ArFSDriveEntity,
-  ArFSClientType
 } from '@atticusofsparta/arfs-lite-client';
 import Arweave from 'arweave';
 
@@ -42,7 +42,9 @@ export interface ArFSDataProvider {
   _arweave: Arweave;
 
   buildDrive(drive: ArFSDriveEntity): Promise<ArFSDrive>; // builds the complete drive structure
-  getEntityType(entityId: EntityID): Promise<ENTITY_TYPES | undefined>; // returns the entity type of the arfs id
+  getEntityType(
+    entityId: EntityID,
+  ): Promise<{ type: ENTITY_TYPES; owner: string } | undefined>; // returns the entity type of the arfs id
 }
 
 export type GqlQueryTagArray = Array<{ name: string; values: Array<string> }>;

@@ -14,7 +14,7 @@ export default defineConfig({
   ],
   // TODO: remove this when no longer deploying to GH pages
   optimizeDeps: {
-   // exclude:['@atticusofsparta/arfs-lite-client'],
+    // exclude:['@atticusofsparta/arfs-lite-client'],
     esbuildOptions: {
       define: {
         global: 'globalThis',

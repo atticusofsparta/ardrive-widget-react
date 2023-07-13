@@ -15,12 +15,11 @@ function useArweaveCompositeDataProvider({
 
   useEffect(() => {
     try {
-      const arweave =
-        Arweave.init({
-          host: 'arweave.net',
-          port: 443,
-          protocol: 'https',
-        });
+      const arweave = Arweave.init({
+        host: 'arweave.net',
+        port: 443,
+        protocol: 'https',
+      });
       const arFSClient = new ArFSClient(arweave);
 
       const arweaveCompositeDataProvider = new ArweaveCompositeDataProvider({

@@ -3,7 +3,7 @@ import { DriveStructure, GqlResultTagArray, TagsObject } from '../types';
 export const ARFS_ID_REGEX = new RegExp(
   '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
 );
-export const ARNS_TXID_REGEX = new RegExp('^[a-z0-9-s+]{43}$');
+export const ARNS_TXID_REGEX = new RegExp('^[a-zA-Z0-9-_]{43}$');
 export const TEST_DRIVE_ID = 'feb06a23-7447-4efe-977c-c361edae5fd7';
 
 export const INITIAL_DRIVE_STATE: DriveStructure = {

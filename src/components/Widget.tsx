@@ -1,7 +1,8 @@
+import { EntityID } from '@atticusofsparta/arfs-lite-client';
 import Arweave from 'arweave';
 import { useEffect, useState } from 'react';
 
-import { Theme } from '../types';
+import { ENTITY_TYPES, Theme } from '../types';
 import { DARK_THEME, LIGHT_THEME } from '../utils/constants';
 import { Files, Menu, Navbar, Search } from './views';
 
@@ -36,7 +37,10 @@ function Widget({
   const [arweave, setArweave] = useState<Arweave>();
   //
   const [arweaveAddress, setArweaveAddress] = useState<string>();
-  const [arfsEntityId, setArfsEntityId] = useState<string>();
+  const [arfsEntityId, setArfsEntityId] = useState<EntityID>();
+  const [entityType, setEntityType] = useState<ENTITY_TYPES | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     switch (theme) {
@@ -68,7 +72,7 @@ function Widget({
     }
 
     if (defaultEntityId) {
-      setArfsEntityId(defaultEntityId);
+      setArfsEntityId(new EntityID(defaultEntityId));
     }
   }, [theme, address, mode, customArweave, defaultEntityId, defaultView]);
 
