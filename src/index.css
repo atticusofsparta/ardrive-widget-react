@@ -17,6 +17,7 @@
   --error: #df1642;
   --info: #3142c4;
   --shadow: 0px 8px 16px 0px #0D0D0DE5, 0px 0px 1px 0px #0D0D0D;
+  --shadow-primary: 0px 2px 16px 0px black, 0px 1px 6px 0px #fe0230;
   --text-subtle: #9e9e9e;
   /* Light Theme Variables */
   --background-light-theme: #ffffff;

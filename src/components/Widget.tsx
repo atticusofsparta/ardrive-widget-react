@@ -84,17 +84,14 @@ function Widget({
   
   },[arfsEntityId])
 
-  useEffect(() => {
-   // console.log({entityType})
-  },[entityType])
 
   async function updateDrive(id:EntityID) {
     try {
-    //  console.log('updating drive', {arfsEntityId, entityType})
+
       if (entityType === ENTITY_TYPES.DRIVE && id){
         const owner = await arweaveDataProvider._ArFSClient.getOwnerForDriveId(id)
         const driveEntity = await arweaveDataProvider._ArFSClient.getPublicDrive({driveId: id, owner})
-      //  console.log(driveEntity)
+  
         const newDrive = await arweaveDataProvider.buildDrive(driveEntity)
         setDrive(newDrive)
       }
@@ -122,6 +119,11 @@ function Widget({
       }
     } catch (error) {
       console.error(error)
+    } finally {
+      console.log(drive)
+      if (drive) {
+        setView('files')
+      }
     }
 
   }
@@ -157,7 +159,7 @@ function Widget({
               />
             ) : view === 'files' ? (
               <Files
-              ids={[]}
+              drive={drive}
               />
             ) : (
               <></>

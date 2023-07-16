@@ -5,11 +5,12 @@ import '../../../index.css';
 import ScrollContainer from '../../ScrollContainer/ScrollContainer';
 import './styles.css';
 import useFilesTable from '../../../hooks/useFilesTable/useFilesTable';
-import { EntityID } from '@atticusofsparta/arfs-lite-client';
+import ArFSDrive from '../../../services/ArFSDrive';
+import CircleProgressBar from '../../progress/CircleProgressBar/CircleProgressBar';
 
-function Files({ids}:{ids?:EntityID[]}) {
+function Files({drive}:{drive?:ArFSDrive}) {
 
-  const {isLoading, rows, columns} = useFilesTable(ids ?? []);
+  const {isLoading, rows, columns} = useFilesTable(drive);
   const [fileData, setFileData] = useState<any[]>([]);
   const [fileColumns, setFileColumns] = useState<any[]>([]);
 
@@ -18,8 +19,16 @@ function Files({ids}:{ids?:EntityID[]}) {
     setFileData(rows);
     setFileColumns(columns);
 
-  },[rows, columns])
+  },[rows])
   
+
+  if (!drive || !rows.length || isLoading || !columns.length) {
+
+    return <div className='flex-column center' style={{height:"100%", marginTop:"70px", position:"relative"}}>
+      <span className='textLarge white' style={{position:"absolute"}}>Loading Drive...</span>
+      <CircleProgressBar size={250} color='var(--primary)' />
+      </div>
+  }
 
   return (
     <div

@@ -58,6 +58,7 @@
     border-collapse: collapse;
     box-sizing: border-box;
     margin-top: 50px;
+    padding-right:40px;
 } 
 
 .files-table-row {
@@ -86,6 +87,7 @@
     width: 100px !important;
     padding: 0px 0px 0px 15px;
     box-sizing: border-box !important;
+    fill: var(--foreground-muted);
 }
 
 .files-table-row > td:nth-child(2) {
@@ -101,11 +103,18 @@
 .files-table-row > td:last-child {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start !important;
     justify-content: flex-start;
     min-width: 'fit-content' !important;
     max-width: none;
     width: 40px !important;
-    margin-right: 50px;
+    height: 100%;
+    padding-top: 16px;
+    padding-left: 0px;
     box-sizing: border-box !important;
+}
+.files-table-row:hover {
+    box-shadow: inset var(--shadow-primary);
+    cursor: pointer;
+
 }

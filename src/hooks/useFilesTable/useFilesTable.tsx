@@ -1,20 +1,25 @@
 import {useState, useEffect} from 'react'
-import { ChevronDownIcon, FileCodeIcon, FileMusicIcon, FileTextIcon, FolderIcon, MovieIcon, VideoIcon } from '../../components/icons'
-import { ArFSDriveEntity, ArFSPublicFile, ArFSPublicFolder } from '@atticusofsparta/arfs-lite-client'
+import { ChevronDownIcon, FileCodeIcon, FileMusicIcon, FileTextIcon, FilesIcon, FolderIcon, MovieIcon, VideoIcon } from '../../components/icons'
+import { ArFSDriveEntity, ArFSPublicFile, ArFSPublicFolder, EntityID } from '@atticusofsparta/arfs-lite-client'
 import { set } from 'lodash'
 import { formatByteCount } from '../../utils/searchUtils'
+import ArFSDrive from '../../services/ArFSDrive'
 
 
 
-function useFilesTable (entities: Array<ArFSPublicFile | ArFSPublicFolder>) {
+function useFilesTable (drive?: ArFSDrive) {
 
     const [rows, setRows] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [errors, setErrors] = useState<boolean>(false)
+   
 
     useEffect(()=>{
-        const newRows = generateRows(entities)
-    },[entities])
+        if(!drive) return
+        const entities = [...drive._folderEntities, ...drive._fileEntities]
+        generateRows(entities)
+        
+    },[drive])
 
 
     function generateTableColumns(){
@@ -23,31 +28,43 @@ function useFilesTable (entities: Array<ArFSPublicFile | ArFSPublicFolder>) {
             title: "Type",
             dataIndex: 'type',
             key: 'type',
-            render: (type: string, row:any) => row?.entityType === 'folder' ? <FolderIcon /> : mapMimeToIcon(type)
+            render: (type: string, row:any) => row?.entityType === 'folder' ? <FolderIcon width={30} height={30} /> : mapMimeToIcon(type)
           },
           {
             title: "Name",
             dataIndex: 'name',
             key: 'name',
-            render: (name:string, row:any) => <div className='flex-column white'  style={{gap:"10px"}}>
+            render: (name:string, row:any) => <div className='flex-column white'  style={{gap:"5px"}}>
                 <span style={{fontSize:"12px"}}>{name}</span>
-                <span style={{fontSize:"12px", color: 'var(--text-subtle)'}}>{formatByteCount(row.size)}</span>
+                <span style={{fontSize:"12px", color: 'var(--text-subtle)'}}>{
+                row.entityType === "folder" ? <> <FilesIcon width={12} height={12} fill='var(--text-subtle)' />({row.size})</> : formatByteCount(row.size)
+                }</span>
             </div>
           },
           {
             title: "Date",
             dataIndex: 'date',
             key: 'date',
-            render: (date:number) => <div className='flex-column white' style={{gap:"10px"}}>
-                <span style={{fontSize:"12px"}}>{new Date(date).toLocaleDateString()}</span>
-                <span style={{fontSize:"12px", color: 'var(--text-subtle)'}}>{new Date(date).toLocaleTimeString()}</span>
+            render: (date:number) => <div className='flex-column white' style={{gap:"5px"}}>
+                <span style={{fontSize:"12px"}}>{Intl.DateTimeFormat('en', {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "2-digit",
+                    
+                }).format(date).split('/').join('-')}</span>
+                <span style={{fontSize:"12px", color: 'var(--text-subtle)'}}>{Intl.DateTimeFormat("en", {
+                   timeStyle: "short",
+                   timeZone: "GMT",
+                   hour12: false,
+                    
+                }).format(date)} GMT</span>
             </div>
           },
           {
             title: "",
             dataIndex: 'action',
             key: 'action',
-            render: () => <button><ChevronDownIcon width={30} height={30} /></button>,
+            render: () => <button style={{border:"none", background:"transparent", width:"fit-content", margin:"0px", padding:"0px"}}><ChevronDownIcon width={10} height={10} fill="var(--foreground-muted)" /></button>,
           },
         ];
       }
@@ -62,8 +79,8 @@ function useFilesTable (entities: Array<ArFSPublicFile | ArFSPublicFolder>) {
             ...entity,
               type: entity.dataContentType,
               name: entity.name,
-              size: entity.size,
-              date: entity.lastModifiedDate,
+              size: entity.entityType === "folder" ? getFileCountForFolder(entity.folderId) : entity.size,
+              date: +entity.lastModifiedDate > 0 ? +entity.lastModifiedDate : +entity.unixTime * 1000,
             };
             // sort by confirmation count (ASC) by default
             fetchedRows.push(rowData);
@@ -78,6 +95,17 @@ function useFilesTable (entities: Array<ArFSPublicFile | ArFSPublicFolder>) {
         setRows(fetchedRows);
         setIsLoading(false);
       }
+
+    function getFileCountForFolder (folderId: EntityID): number { 
+        let count = 0
+
+        for (const entity of [...drive!._fileEntities, ...drive!._folderEntities]) {
+            if(entity.parentFolderId.toString() === folderId.toString()) {
+                count++
+            }
+        }
+        return count
+    }
 
     function mapMimeToIcon (type: string) {
 
