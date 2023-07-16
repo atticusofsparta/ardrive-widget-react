@@ -19,10 +19,10 @@ function Files({drive}:{drive?:ArFSDrive}) {
     setFileData(rows);
     setFileColumns(columns);
 
-  },[rows])
+  },[drive])
   
 
-  if (!drive || !rows.length || isLoading || !columns.length) {
+  if (isLoading) {
 
     return <div className='flex-column center' style={{height:"100%", marginTop:"70px", position:"relative"}}>
       <span className='textLarge white' style={{position:"absolute"}}>Loading Drive...</span>
@@ -53,14 +53,20 @@ function Files({drive}:{drive?:ArFSDrive}) {
       >
         <ScrollContainer
           scrollBarContainerStyle={{}}
-          scrollBarContainerHeight={275}
+          scrollBarContainerHeight={rows.length > 0 ? 275 : 0}
         >
           <Table
             columns={fileColumns}
-            data={fileData}
+            data={rows}
             prefixCls="files-table"
             rowClassName="files-table-row"
             tableLayout="auto"
+            emptyText={<div className='flex-column white textLarge center' style={{width:"100%", height:"100%", marginTop:"20%", marginLeft:"20px"}}>
+            No files found.
+            <br />
+            <br />
+            <span className='textMedium'>Try importing a drive, folder, or file on the import screen.</span>
+          </div>}
           />
         </ScrollContainer>
       </div>

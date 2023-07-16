@@ -55,7 +55,7 @@ function ScrollContainer({
         scrollContainer.removeEventListener('scroll', handleScroll);
       }
     };
-  }, []);
+  }, [scrollBarContainerHeight]);
 
   const scrollbarStyle: CSSProperties = {
     ...scrollBarStyle,
