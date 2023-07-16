@@ -4,10 +4,9 @@ import {
   ArweaveAddress,
   EntityID,
   PrivateKeyData,
+  ArFSPublicDrive,
+  ArFSDriveEntity
 } from '@atticusofsparta/arfs-lite-client';
-import {
-  ArFSDriveEntity,
-} from '@atticusofsparta/arfs-lite-client/types/arfs/drive';
 import { useEffect, useState } from 'react';
 
 import useArweaveCompositeDataProvider from '../../../hooks/useArweaveCompositeDataProvider/useArweaveCompositeDataProvider';
@@ -15,6 +14,14 @@ import { ENTITY_TYPES, SEARCH_TYPES } from '../../../types';
 import SearchBar from '../../inputs/SearchBar/SearchBar';
 import CircleProgressBar from '../../progress/CircleProgressBar/CircleProgressBar';
 import { ChevronDownIcon, DatabaseIcon, FilesIcon, FolderIcon } from '../../icons';
+import { add, get } from 'lodash';
+import { checkSearchType } from '../../../utils/searchUtils';
+import ScrollContainer from '../../ScrollContainer/ScrollContainer';
+
+export type WithOwner = { owner:string }
+export type ArFSPublicDriveWithOwner = ArFSDriveEntity & WithOwner;
+export type ArFSPublicFolderWithOwner = ArFSPublicFolder & WithOwner;
+export type ArFSPublicFileWithOwner = ArFSPublicFile & WithOwner;
 
 function Search({
   addressCallback,
@@ -23,48 +30,54 @@ function Search({
   defaultAddress,
   defaultEntityId,
 }: {
-  addressCallback: (address:string) => string;
-  entityIdCallback: (entityId:string) => string;
-  entityTypeCallback: (entitType:ENTITY_TYPES) => ENTITY_TYPES;
+  addressCallback: (address:string) => void;
+  entityIdCallback: (entityId:string) => void;
+  entityTypeCallback: (entitType:ENTITY_TYPES | undefined) => void;
   defaultAddress?: string;
   defaultEntityId?: string;
 }) {
-  const [searchType, setSearchType] = useState<SEARCH_TYPES>();
+  const [searchType, setSearchType] = useState<SEARCH_TYPES | undefined>(()=> defaultAddress ? SEARCH_TYPES.ARWEAVE_WALLET_ADDRESS : defaultEntityId ? SEARCH_TYPES.ARFS_ID : undefined);
   const [searchQuery, setSearchQuery] = useState<string | undefined>();
   const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [searchResults, setSearchResults] = useState<
-    ArFSDriveEntity[] | ArFSPublicFolder[] | ArFSPublicFile[] | undefined
-  >();
+  const [searchResults, setSearchResults] = useState<ArFSPublicDriveWithOwner[] | ArFSPublicFolderWithOwner[] | ArFSPublicFileWithOwner[] | undefined>();
   const [arfsEntityType, setArfsEntityType] = useState<ENTITY_TYPES>();
 
-  const arweaveDataProvider = useArweaveCompositeDataProvider({});
 
-  useEffect(() => {
-    if (defaultAddress) {
-      setIsSearching(true);
-      search(defaultAddress);
-      return
-    }
-    if (defaultEntityId) {
-      setIsSearching(true);
-      search(defaultEntityId);
-      return
-    }
-    if (searchQuery) {
-      setIsSearching(true);
-      search(searchQuery);
-      return
-    }
-  reset()
-  }, [searchQuery]);
+  const arweaveDataProvider = useArweaveCompositeDataProvider();
 
   function reset () {
     setSearchType(undefined);
     setSearchQuery(undefined);
     setSearchResults(undefined);
+    setArfsEntityType(undefined);
+    addressCallback(defaultAddress ?? '');
+    entityIdCallback(defaultEntityId ?? '');
+    entityTypeCallback(undefined);
   }
 
-  async function search(query: string) {
+  useEffect(() => {
+
+    if (searchQuery) {
+      setIsSearching(true);
+      search(searchQuery);
+      return
+    }
+
+    if (defaultAddress) {
+      setIsSearching(true);
+      search(defaultAddress, SEARCH_TYPES.ARWEAVE_WALLET_ADDRESS);
+      return
+    }
+    if (defaultEntityId) {
+      setIsSearching(true);
+      search(defaultEntityId, SEARCH_TYPES.ARFS_ID);
+      return
+    }
+
+  reset()
+  }, [searchQuery]);
+
+  async function search(query: string, type?: SEARCH_TYPES) {
 
     if (!query) {
       return
@@ -75,8 +88,9 @@ function Search({
       if (!arweaveDataProvider) {
         throw new Error('Arweave Data Provider is undefined');
       }
-      console.log({searchType})
-      switch (searchType) {
+      const queryType = type ?? checkSearchType(query);
+
+      switch (queryType) {
        
         case SEARCH_TYPES.ARWEAVE_WALLET_ADDRESS: {
           const drives =
@@ -85,7 +99,10 @@ function Search({
               privateKeyData: new PrivateKeyData({}),
               latestRevisionsOnly: false,
             });
-          setSearchResults([...drives]);
+          const drivesWithOwner: ArFSPublicDriveWithOwner[] = drives.map((drive) => {
+            return { ...drive, owner: query } as ArFSPublicDriveWithOwner;
+          });
+          setSearchResults([...drivesWithOwner]);
           setArfsEntityType(ENTITY_TYPES.DRIVE);
           break;
         }
@@ -96,14 +113,13 @@ function Search({
           const entitType = entityResults?.type;
           const owner = entityResults?.owner;
           setArfsEntityType(entitType);
-          console.log({entitType, owner, query, searchType})
 
           if (entitType === ENTITY_TYPES.DRIVE && owner) {
             const drive = await arweaveDataProvider?._ArFSClient.getPublicDrive({
                 driveId: new EntityID(query),
                 owner: new ArweaveAddress(owner),
               });
-           setSearchResults(drive !== undefined ? [{...drive}] : undefined);
+           setSearchResults(drive !== undefined ? [{...drive, owner}] : undefined);
            setArfsEntityType(entitType);
             
           }
@@ -114,7 +130,7 @@ function Search({
                 folderId: new EntityID(query),
                 owner: new ArweaveAddress(owner),
               });
-              setSearchResults(folder !== undefined ? [{...folder}] : undefined);
+              setSearchResults(folder !== undefined ? [{...folder, owner}] : undefined);
               setArfsEntityType(entitType);
           }
 
@@ -123,7 +139,7 @@ function Search({
                 fileId: new EntityID(query),
                 owner: new ArweaveAddress(owner),
               });
-              setSearchResults(file !== undefined ? [{...file}] : undefined);
+              setSearchResults(file !== undefined ? [{...file, owner}] : undefined);
               setArfsEntityType(entitType);
               
           }
@@ -153,42 +169,116 @@ function Search({
     }
   }
 
+  function handleCallback (result:ArFSPublicDriveWithOwner | ArFSPublicFolderWithOwner | ArFSPublicFileWithOwner) {
+    try {
+      console.log(result)
+   
+        if (result instanceof ArFSPublicDrive) {
+          entityIdCallback(result.driveId.toString());
+          entityTypeCallback(ENTITY_TYPES.DRIVE);
+          addressCallback(result.owner);
+        }
+        if (result instanceof ArFSPublicFolder) {
+          entityIdCallback(result.folderId.toString());
+          entityTypeCallback(ENTITY_TYPES.FOLDER);
+          addressCallback(result.owner);
+        }
+        if (result instanceof ArFSPublicFile) {
+          entityIdCallback(result.fileId.toString());
+          entityTypeCallback(ENTITY_TYPES.FILE);
+          addressCallback(result.owner);
+        }
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 
   return (
+    <>
     <div
       className="flex-column space-between"
       style={{ height: '100%', width: '100%', position:"relative" }}
     >
       <div className="flex-column gap" style={{ height: '100%' }}>
+{!searchResults ?
         <SearchBar
           isSearching={isSearching}
           searchType={searchType}
           setSearchType={setSearchType}
           setSearchQuery={setSearchQuery}
           searchQuery={searchQuery}
-        />
+        /> :
+        <div>
+          <div className='flex-row space-between'>
+          <span className='text white'>
+            Owner: {searchResults[0].owner.toString().slice(0, 10) + "..." + searchResults[0].owner.toString().slice(-10)}
+            <br />
+            Import Type: { arfsEntityType && !defaultAddress ? arfsEntityType.toString().slice(0,1).toUpperCase() + arfsEntityType?.toString().slice(1) : 'Address'}
+            </span>
+          <button 
+          className="button-primary white" 
+          style={{ width:"fit-content", height:"fit-content", padding:"10px 15px"}} onClick={()=> reset()}>
+            Back to Search
+            </button>
+          </div>
+        </div>
+        }
         <div
           className="white textLarge flex-column flex-center gap scroll-container"
           style={{ height: '275px', margin: '10px 0px', width: '100%', boxSizing:"border-box", borderRadius:"5px"}}
         >
-          {!isSearching ? searchResults ? searchResults.map((result)=> 
-          <div className='flex-row textLarge white space-between gap radius hover' style={{
+          
+          {!isSearching ? searchResults ? 
+          <ScrollContainer
+          contentStyle={{
+            display: 'flex',
+            flexDirection: 'column',
+            paddingRight: '30px',
+            gap: '10px',
+          }}
+          scrollBarContainerStyle={{
+          right: '0px',
+          }}
+          scrollBarContainerHeight={250}
+          >
+          {searchResults.map((result)=> 
+          <button className='flex-row textLarge white space-between gap radius hover' style={{
             width:"100%", 
             minHeight:'50px',
             boxShadow: 'var(--shadow)',
+            background: 'var(--background)',
             alignItems: 'center',
             padding: '0 10px',
             boxSizing:"border-box",
             cursor: 'pointer',
             border: '1px solid var(--text-subtle)',
             fill: 'var(--foreground-muted)',
-            }}>
+            }}
+            onClick={()=> handleCallback(result)}
+            >
             {getIcon(arfsEntityType ?? ENTITY_TYPES.FILE)}
             {result.name}
             <ChevronDownIcon width={15} height={15} style={{transform:"rotate(-90deg)"}}/>
-          </div> 
+          </button> )}
+          </ScrollContainer>
           
-          ) : <span className="faded flex-column center" style={{height:"100%"}} >No Results</span> : (
+           : <span className="faded flex-column center" style={{height:"100%", gap:"30px"}} >
+            No Results
+            { defaultAddress || defaultEntityId ?
+            <button className='button-primary white' style={{padding:"10px 15px", fontSize:"18px"}} onClick={()=> {
+              if (defaultAddress) {
+                search(defaultAddress, SEARCH_TYPES.ARWEAVE_WALLET_ADDRESS)
+              }
+              if (defaultEntityId) {
+                search(defaultEntityId, SEARCH_TYPES.ARFS_ID)
+              }
+              }}>
+              Reset to defaults
+            </button>
+            : <></>}
+            </span> : (
            
             <span className="faded flex-column center" style={{height:"100%"}} > 
             <CircleProgressBar size={80} color="white" />
@@ -196,8 +286,10 @@ function Search({
           )}
         </div>
       </div>
-      <button className="link white flex-row center" style={{position:"absolute", bottom:"-10px", left:0, width:"100%"}}>What is ArDrive?</button>
+     
     </div>
+     <button className="link white flex-row center" style={{position:"relative", width:"100%", marginTop: "5px"}}>What is ArDrive?</button>
+     </>
   );
 }
 

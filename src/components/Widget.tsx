@@ -61,11 +61,7 @@ function Widget({
       setArweave(customArweave);
     }
     if (address) {
-      if (typeof address === 'function') {
-        setArweaveAddress(address());
-      } else {
-        setArweaveAddress(address);
-      }
+      setArweaveAddress(getDefaultAddress(address));
     }
     if (defaultView) {
       setView(defaultView);
@@ -75,6 +71,15 @@ function Widget({
       setArfsEntityId(new EntityID(defaultEntityId));
     }
   }, [theme, address, mode, customArweave, defaultEntityId, defaultView]);
+
+  function getDefaultAddress (address: string |( () => string)) {
+    if (typeof address === 'function') {
+      return address();
+    } else {
+      return address;
+    }
+  }
+  
 
   return (
     <>
@@ -89,7 +94,13 @@ function Widget({
 
           <div className="viewContainer">
             {view === 'search' ? (
-              <Search />
+              <Search 
+              addressCallback={(address)=> setArweaveAddress(address)}
+              entityIdCallback={(entityId) => setArfsEntityId(new EntityID(entityId))}
+              entityTypeCallback={(entityType: ENTITY_TYPES | undefined) => setEntityType(entityType)}
+              defaultAddress={address ? getDefaultAddress(address) : undefined}
+              defaultEntityId={defaultEntityId}
+              />
             ) : view === 'files' ? (
               <Files />
             ) : (

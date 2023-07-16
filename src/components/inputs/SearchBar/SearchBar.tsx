@@ -22,17 +22,11 @@ function SearchBar({
   const [searchBarText, setSearchBarText] = useState('');
   const [isSearchValid, setIsSearchValid] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    if (searchQuery?.length) {
-      setSearchBarText(searchQuery);
-    }
-  }, [searchQuery]);
-
   function reset() {
     setSearchBarText('');
     setIsSearchValid(null);
     setSearchType(undefined);
-    setSearchQuery(undefined);
+    setSearchQuery('');
   }
 
   async function handleChange(e: any) {

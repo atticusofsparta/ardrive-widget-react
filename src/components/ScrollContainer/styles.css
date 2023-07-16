@@ -1,0 +1,38 @@
+.scroll-container {
+    display: flex;
+    overflow-x: scroll;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+}
+
+.scroll-container-content {
+    display: flex;
+    flex-direction: row;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+}
+
+.scrollbar-container {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 3px;
+    height: 100%;
+    box-sizing: border-box;
+    right: 20px;
+    top: 70px;
+    bottom: 20px;
+    background-color: var(--input-text);
+    align-items: center;
+    border-radius: 2px;
+}
+
+.scrollbar {
+    display: flex;
+    flex-direction: row;
+    width: 3px;
+    background-color: var(--text-subtle);
+    border-radius: 2px;
+}
