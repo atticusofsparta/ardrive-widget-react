@@ -1,10 +1,12 @@
-import { EntityID } from '@atticusofsparta/arfs-lite-client';
+import { ArFSDriveEntity, ArweaveAddress, EntityID } from '@atticusofsparta/arfs-lite-client';
 import Arweave from 'arweave';
 import { useEffect, useState } from 'react';
 
 import { ENTITY_TYPES, Theme } from '../types';
 import { DARK_THEME, LIGHT_THEME } from '../utils/constants';
 import { Files, Menu, Navbar, Search } from './views';
+import ArFSDrive from '../services/ArFSDrive';
+import useArweaveCompositeDataProvider from '../hooks/useArweaveCompositeDataProvider/useArweaveCompositeDataProvider';
 
 function Widget({
   theme = 'dark',
@@ -26,6 +28,7 @@ function Widget({
   preferredHideMode?: 'icon' | 'dropdown' | 'invisible'; // widget hide behavior
   cacheResults?: boolean; // whether or not to cache results
 }) {
+  const arweaveDataProvider = useArweaveCompositeDataProvider(customArweave);
   const [view, setView] = useState<'search' | 'files' | 'drive'>(defaultView);
   const [showMenu, setShowMenu] = useState<boolean>(true);
   const [hideWidget, setHideWidget] = useState<boolean>(true);
@@ -41,6 +44,8 @@ function Widget({
   const [entityType, setEntityType] = useState<ENTITY_TYPES | undefined>(
     undefined,
   );
+
+  const [drive, setDrive] = useState<ArFSDrive>();
 
   useEffect(() => {
     switch (theme) {
@@ -72,6 +77,55 @@ function Widget({
     }
   }, [theme, address, mode, customArweave, defaultEntityId, defaultView]);
 
+  useEffect(() => {
+    if (arfsEntityId) {
+        updateDrive(arfsEntityId)
+    }
+  
+  },[arfsEntityId])
+
+  useEffect(() => {
+   // console.log({entityType})
+  },[entityType])
+
+  async function updateDrive(id:EntityID) {
+    try {
+    //  console.log('updating drive', {arfsEntityId, entityType})
+      if (entityType === ENTITY_TYPES.DRIVE && id){
+        const owner = await arweaveDataProvider._ArFSClient.getOwnerForDriveId(id)
+        const driveEntity = await arweaveDataProvider._ArFSClient.getPublicDrive({driveId: id, owner})
+      //  console.log(driveEntity)
+        const newDrive = await arweaveDataProvider.buildDrive(driveEntity)
+        setDrive(newDrive)
+      }
+      if (entityType === ENTITY_TYPES.FOLDER && id){
+        const entityTypeResult = await arweaveDataProvider.getEntityType(id)
+        if (!entityTypeResult || entityTypeResult.type !== ENTITY_TYPES.FOLDER) {
+          throw new Error('Invalid entity type')
+        }
+        const folderEntity = await arweaveDataProvider._ArFSClient.getPublicFolder({folderId: id, owner: new ArweaveAddress(entityTypeResult.owner)})
+        const driveEntity = await arweaveDataProvider._ArFSClient.getPublicDrive({driveId: folderEntity.driveId, owner: new ArweaveAddress(entityTypeResult.owner)})
+        const newDrive = await arweaveDataProvider.buildDrive(driveEntity)
+        setDrive(newDrive)
+
+      }
+      if (entityType === ENTITY_TYPES.FILE && id){
+        const entityTypeResult = await arweaveDataProvider.getEntityType(id)
+        if (!entityTypeResult || entityTypeResult.type !== ENTITY_TYPES.FILE) {
+          throw new Error('Invalid entity type')
+        }
+        const fileEntity = await arweaveDataProvider._ArFSClient.getPublicFile({fileId: id, owner: new ArweaveAddress(entityTypeResult.owner)})
+        console.log(fileEntity.driveId, entityTypeResult.owner)
+        const driveEntity = await arweaveDataProvider._ArFSClient.getPublicDrive({driveId: fileEntity.driveId, owner: new ArweaveAddress(entityTypeResult.owner)})
+        const newDrive = await arweaveDataProvider.buildDrive(driveEntity)
+        setDrive(newDrive)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+
+  }
+
   function getDefaultAddress (address: string |( () => string)) {
     if (typeof address === 'function') {
       return address();
@@ -96,13 +150,15 @@ function Widget({
             {view === 'search' ? (
               <Search 
               addressCallback={(address)=> setArweaveAddress(address)}
-              entityIdCallback={(entityId) => setArfsEntityId(new EntityID(entityId))}
-              entityTypeCallback={(entityType: ENTITY_TYPES | undefined) => setEntityType(entityType)}
+              entityIdCallback={(entityId) => setArfsEntityId(new EntityID(entityId.toString()))}
+              entityTypeCallback={(type: ENTITY_TYPES | undefined) => setEntityType(type)}
               defaultAddress={address ? getDefaultAddress(address) : undefined}
               defaultEntityId={defaultEntityId}
               />
             ) : view === 'files' ? (
-              <Files />
+              <Files
+              ids={[]}
+              />
             ) : (
               <></>
             )}

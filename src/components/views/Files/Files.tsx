@@ -4,51 +4,22 @@ import { useEffect, useState } from 'react';
 import '../../../index.css';
 import ScrollContainer from '../../ScrollContainer/ScrollContainer';
 import './styles.css';
+import useFilesTable from '../../../hooks/useFilesTable/useFilesTable';
+import { EntityID } from '@atticusofsparta/arfs-lite-client';
 
-function Files() {
-  const [filePath, setFilePath] = useState();
+function Files({ids}:{ids?:EntityID[]}) {
 
-  const [tableItems, setTableItems] = useState<JSX.Element[]>([<></>]);
-  const [maxItemCount, setMaxItemCount] = useState(10);
-  const [pageRange, setPageRange] = useState<number[]>([0, maxItemCount]);
-  const [sortType, setSortType] = useState<string>(); // newest, oldest, filesize, name a-z z-a, file type
-  const [filterType, setFilterType] = useState<string[]>();
-  // only show by file type, size range, older than or newer than set date (datepicker) - multi filter
+  const {isLoading, rows, columns} = useFilesTable(ids ?? []);
+  const [fileData, setFileData] = useState<any[]>([]);
+  const [fileColumns, setFileColumns] = useState<any[]>([]);
 
-  function updateTableItems() {}
+  useEffect(()=>{
 
-  const columns = [
-    {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-    },
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
-    },
-    {
-      title: '',
-      dataIndex: 'action',
-      key: 'action',
-      width: 30,
-    },
-  ];
+    setFileData(rows);
+    setFileColumns(columns);
 
-  const data = [
-    { type: 'file', name: 'john', date: 'some where', action: '>' },
-    { type: 'file', name: 'john', date: 'some where', action: '>' },
-    { type: 'file', name: 'john', date: 'some where', action: '>' },
-    { type: 'file', name: 'john', date: 'some where', action: '>' },
-    { type: 'file', name: 'john', date: 'some where', action: '>' },
-    { type: 'file', name: 'john', date: 'some where', action: '>' },
-  ];
+  },[rows, columns])
+  
 
   return (
     <div
@@ -76,8 +47,8 @@ function Files() {
           scrollBarContainerHeight={275}
         >
           <Table
-            columns={columns}
-            data={data}
+            columns={fileColumns}
+            data={fileData}
             prefixCls="files-table"
             rowClassName="files-table-row"
             tableLayout="auto"

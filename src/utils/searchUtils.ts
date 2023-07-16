@@ -29,3 +29,17 @@ export function isArFSID(id?: string) {
 
   return ARFS_ID_REGEX.test(id);
 }
+
+export function formatByteCount(byteCount:number) {
+  const byteCountTypes = ['bytes', 'kilobytes', 'megabytes', 'gigabytes', 'terabytes', 'petabytes', 'exabytes'];
+  const base = 1024;
+  let count = byteCount;
+  let typeIndex = 0;
+
+  while (count >= base && typeIndex < byteCountTypes.length - 1) {
+    count /= base;
+    typeIndex++;
+  }
+
+  return `${count.toFixed(2)} ${byteCountTypes[typeIndex]}`;
+}

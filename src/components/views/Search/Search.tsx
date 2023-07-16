@@ -74,7 +74,7 @@ function Search({
       return
     }
 
-  reset()
+  //reset()
   }, [searchQuery]);
 
   async function search(query: string, type?: SEARCH_TYPES) {
@@ -169,24 +169,30 @@ function Search({
     }
   }
 
-  function handleCallback (result:ArFSPublicDriveWithOwner | ArFSPublicFolderWithOwner | ArFSPublicFileWithOwner) {
+  function handleCallback (result:any) {
     try {
       console.log(result)
    
-        if (result instanceof ArFSPublicDrive) {
-          entityIdCallback(result.driveId.toString());
-          entityTypeCallback(ENTITY_TYPES.DRIVE);
-          addressCallback(result.owner);
-        }
-        if (result instanceof ArFSPublicFolder) {
-          entityIdCallback(result.folderId.toString());
+        if (Object.keys(result).includes('folderId')) {
           entityTypeCallback(ENTITY_TYPES.FOLDER);
+          entityIdCallback(result.folderId.entityId.toString());
+          
           addressCallback(result.owner);
+          return
         }
-        if (result instanceof ArFSPublicFile) {
-          entityIdCallback(result.fileId.toString());
+        if (Object.keys(result).includes('fileId')) {
           entityTypeCallback(ENTITY_TYPES.FILE);
+          entityIdCallback(result.fileId.entityId.toString());
+          
           addressCallback(result.owner);
+          return
+        }
+        if (Object.keys(result).includes('driveId')) {
+          entityTypeCallback(ENTITY_TYPES.DRIVE);
+          entityIdCallback(result.driveId.entityId.toString());
+          
+          addressCallback(result.owner);
+          return
         }
 
     } catch (error) {

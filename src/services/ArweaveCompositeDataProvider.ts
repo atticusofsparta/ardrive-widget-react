@@ -1,6 +1,7 @@
 import {
   ArFSClientType,
   ArFSDriveEntity,
+  ArweaveAddress,
   EntityID,
 } from '@atticusofsparta/arfs-lite-client';
 import Arweave from 'arweave';
@@ -26,23 +27,26 @@ class ArweaveCompositeDataProvider implements ArFSDataProvider {
 
   async buildDrive(drive: ArFSDriveEntity): Promise<ArFSDrive> {
     const owner = await this._ArFSClient.getOwnerForDriveId(drive.driveId);
+    console.log({owner, string: JSON.parse(JSON.stringify(drive.driveId))["entityId"]})
     const folders = await this._ArFSClient.getAllFoldersOfPublicDrive({
-      driveId: drive.driveId,
-      owner,
+      driveId: new EntityID(JSON.parse(JSON.stringify(drive.driveId))["entityId"]),
+      owner: new ArweaveAddress(JSON.parse(JSON.stringify(owner))["address"]),
       latestRevisionsOnly: true,
     });
+    
     const files = await this._ArFSClient.getPublicFilesWithParentFolderIds({
       folderIDs: folders.map((f) => f.folderId),
-      owner,
+      owner: new ArweaveAddress(JSON.parse(JSON.stringify(owner))["address"]),
       latestRevisionsOnly: true,
     });
+    
     return new ArFSDrive(drive, folders, files);
   }
 
   async getEntityType(
     entityId: EntityID,
   ): Promise<{ type: ENTITY_TYPES; owner: string } | undefined> {
-    const ids = ['Drive-Id', 'Folder-Id', 'File-Id'];
+    const ids = ['Folder-Id', 'File-Id','Drive-Id'];
     const queries = ids.map((entityType) =>
       entityQuery({
         id: entityId.toString(),
