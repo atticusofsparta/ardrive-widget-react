@@ -80,7 +80,11 @@ function Widget({
   useEffect(() => {
     if (arfsEntityId) {
         updateDrive(arfsEntityId)
+        return
     }
+ 
+      setDrive(undefined)
+  
   
   },[arfsEntityId])
 

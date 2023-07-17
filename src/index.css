@@ -193,3 +193,12 @@ button {
   border-color: var(--primary);
   transition: all 0.2s ease-in-out;
 }
+
+.button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0px;
+  margin: 0px;
+}

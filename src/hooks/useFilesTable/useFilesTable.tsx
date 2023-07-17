@@ -12,6 +12,7 @@ function useFilesTable (drive?: ArFSDrive) {
     const [rows, setRows] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [errors, setErrors] = useState<boolean>(false)
+    const [expandedRow, setExpandedRow] = useState<string>();
    
 
     useEffect(()=>{
@@ -64,7 +65,19 @@ function useFilesTable (drive?: ArFSDrive) {
             title: "",
             dataIndex: 'action',
             key: 'action',
-            render: () => <button style={{border:"none", background:"transparent", width:"fit-content", margin:"0px", padding:"0px"}}><ChevronDownIcon width={10} height={10} fill="var(--foreground-muted)" /></button>,
+            render: (row:any) => <button 
+            style={{
+                border:"none", 
+                background:"transparent", 
+                width:"fit-content",
+                margin:"0px", 
+                padding:"0px"}}>
+              {row?.isExpanded ? (
+              <ChevronDownIcon width={10} height={10} fill="var(--foreground-muted)" style={{transform:"rotate(180deg)"}} />
+            ) : (
+              <ChevronDownIcon width={10} height={10} fill="var(--foreground-muted)" />
+            )}
+                    </button>,
           },
         ];
       }
@@ -80,7 +93,9 @@ function useFilesTable (drive?: ArFSDrive) {
               type: entity.dataContentType,
               name: entity.name,
               size: entity.entityType === "folder" ? getFileCountForFolder(entity.folderId) : entity.size,
-              date: +entity.lastModifiedDate > 0 ? +entity.lastModifiedDate : +entity.unixTime * 1000,
+              date: +entity.lastModifiedDate > 0 ? +entity.lastModifiedDate : +entity.unixTime * 1000, 
+              key: entity.entityId.toString(),        
+              isExpanded: expandedRow === entity.entityId.toString(),
             };
             // sort by confirmation count (ASC) by default
             fetchedRows.push(rowData);
@@ -124,15 +139,24 @@ function useFilesTable (drive?: ArFSDrive) {
                 return <FileCodeIcon width={30} height={30} />
             default:<FileCodeIcon width={30} height={30} />
         }
-
-
     }
+    function handleRowExpand(row: any) {
+      
+        if (expandedRow === row.entityId.toString()){
+            setExpandedRow(undefined)
+            return
+          }
+        setExpandedRow(row.entityId.toString())
+        console.log(expandedRow)
+      }
 
     return {
-        rows,
+        rows: rows,
         columns: generateTableColumns(),
         isLoading,
-        errors
+        errors,
+        expandRow: handleRowExpand,
+        expandedRowKey: expandedRow
     }
 }
 

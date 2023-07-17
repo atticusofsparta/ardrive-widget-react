@@ -2,8 +2,9 @@ import { ReactComponent as BookIcon } from './Book.svg';
 import { ReactComponent as ChevronDownIcon } from './ChevronDown.svg';
 import { ReactComponent as CircleCheckIcon } from './CircleCheck.svg';
 import { ReactComponent as CloseIcon } from './Close.svg';
-import { ReactComponent as DatabaseIcon } from './Database.svg';
+import { ReactComponent as CopyIcon } from './Copy.svg';
 import { ReactComponent as DatabaseExportIcon } from './DatabaseExport.svg';
+import { ReactComponent as DatabaseIcon } from './Database.svg';
 import { ReactComponent as DatabaseImportIcon } from './DatabaseImport.svg';
 import { ReactComponent as EyesOffIcon } from './EyeOff.svg';
 import { ReactComponent as FileCode2Icon } from './FileCode2.svg';
@@ -29,33 +30,34 @@ import { ReactComponent as SettingsIcon } from './Settings.svg';
 import { ReactComponent as VideoIcon } from './Video.svg';
 
 export {
-  VideoIcon,
-  SettingsIcon,
-  PantoneIcon,
-  NoteIcon,
-  MovieIcon,
-  LoaderIcon,
-  InfoIcon,
-  FolderIcon,
-  FoldersIcon,
-  FileZipIcon,
-  FileXIcon,
-  FileTextIcon,
-  FilesIcon,
-  FileMusicIcon,
-  FileInfoIcon,
-  FileDownloadIcon,
-  FileCodeIcon,
-  FileCode2Icon,
-  EyesOffIcon,
-  DatabaseExportIcon,
-  DatabaseImportIcon,
-  DatabaseIcon,
-  CircleCheckIcon,
   BookIcon,
   ChevronDownIcon,
-  MenuIcon,
-  SearchIcon,
+  CircleCheckIcon,
   CloseIcon,
+  CopyIcon,
+  DatabaseExportIcon,
+  DatabaseIcon,
+  DatabaseImportIcon,
+  EyesOffIcon,
+  FileCode2Icon,
+  FileCodeIcon,
+  FileDownloadIcon,
+  FileInfoIcon,
+  FileMusicIcon,
+  FileTextIcon,
+  FileXIcon,
+  FileZipIcon,
+  FilesIcon,
+  FolderIcon,
+  FoldersIcon,
+  InfoIcon,
+  LoaderIcon,
+  MenuIcon,
+  MovieIcon,
+  NoteIcon,
+  PantoneIcon,
   ProgressCircleQuarter,
+  SearchIcon,
+  SettingsIcon,
+  VideoIcon,
 };
