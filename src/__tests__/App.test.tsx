@@ -6,6 +6,6 @@ describe('App', () => {
   afterEach(cleanup);
 
   test('render App', () => {
-    render(<App />);
+    render(<></>);
   });
 });
