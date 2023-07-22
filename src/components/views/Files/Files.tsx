@@ -1,15 +1,16 @@
 import Table from 'rc-table';
 import { useEffect, useState } from 'react';
-import '../../../index.css';
-import ScrollContainer from '../../ScrollContainer/ScrollContainer';
-import './styles.css';
+
 import useFilesTable from '../../../hooks/useFilesTable/useFilesTable';
 import ArFSDrive from '../../../services/ArFSDrive';
+import ScrollContainer from '../../ScrollContainer/ScrollContainer';
 import CircleProgressBar from '../../progress/CircleProgressBar/CircleProgressBar';
 import FileDetails from './FileDetails/FileDetails';
+import './styles.css';
 
 function Files({ drive }: { drive?: ArFSDrive }) {
-  const { isLoading, rows, columns, expandRow, expandedRowKey } = useFilesTable(drive);
+  const { isLoading, rows, columns, expandRow, expandedRowKey } =
+    useFilesTable(drive);
   const [fileData, setFileData] = useState<any[]>([]);
   const [fileColumns, setFileColumns] = useState<any[]>([]);
 
@@ -67,20 +68,25 @@ function Files({ drive }: { drive?: ArFSDrive }) {
             expandable={{
               rowExpandable: () => true,
               expandRowByClick: true,
-              expandedRowKeys: [expandedRowKey ?? ""],
-              expandedRowRender: (record) => <FileDetails row={record} />
+              expandedRowKeys: [expandedRowKey ?? ''],
+              expandedRowRender: (record) => <FileDetails row={record} />,
             }}
             onRow={(record) => ({
               onClick: () => {
                 expandRow(record);
-              }
+              },
             })}
             emptyText={
-              <div className="flex-column white textLarge center" style={{ width: '100%', height: '100%', marginTop: '20px' }}>
+              <div
+                className="flex-column white textLarge center"
+                style={{ width: '100%', height: '100%', marginTop: '20px' }}
+              >
                 No files found.
                 <br />
                 <br />
-                <span className="textMedium">Try importing a drive, folder, or file on the import screen.</span>
+                <span className="textMedium">
+                  Try importing a drive, folder, or file on the import screen.
+                </span>
               </div>
             }
           />

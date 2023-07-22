@@ -1,13 +1,11 @@
 import {
   ArFSDriveEntity,
-  ArFSPublicDrive,
   ArFSPublicFile,
   ArFSPublicFolder,
   ArweaveAddress,
   EntityID,
   PrivateKeyData,
 } from '@atticusofsparta/arfs-lite-client';
-import { add, get } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import useArweaveCompositeDataProvider from '../../../hooks/useArweaveCompositeDataProvider/useArweaveCompositeDataProvider';
@@ -313,8 +311,9 @@ function Search({
               searchResults ? (
                 searchResults.length <= 4 ? (
                   <>
-                    {searchResults.map((result) => (
+                    {searchResults.map((result, index) => (
                       <button
+                        key={index}
                         className="flex-row textLarge white space-between gap radius hover"
                         style={{
                           width: '100%',
@@ -354,8 +353,9 @@ function Search({
                     }}
                     scrollBarContainerHeight={220}
                   >
-                    {searchResults.map((result) => (
+                    {searchResults.map((result, index) => (
                       <button
+                        key={index}
                         className="flex-row textLarge white space-between gap radius hover"
                         style={{
                           width: '100%',

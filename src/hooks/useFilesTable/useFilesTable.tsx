@@ -1,10 +1,8 @@
 import {
-  ArFSDriveEntity,
   ArFSPublicFile,
   ArFSPublicFolder,
   EntityID,
 } from '@atticusofsparta/arfs-lite-client';
-import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import {
@@ -23,7 +21,6 @@ import { formatByteCount } from '../../utils/searchUtils';
 function useFilesTable(drive?: ArFSDrive) {
   const [rows, setRows] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [errors, setErrors] = useState<boolean>(false);
   const [expandedRow, setExpandedRow] = useState<string>();
 
   useEffect(() => {
@@ -204,7 +201,6 @@ function useFilesTable(drive?: ArFSDrive) {
     rows: rows,
     columns: generateTableColumns(),
     isLoading,
-    errors,
     expandRow: handleRowExpand,
     expandedRowKey: expandedRow,
   };

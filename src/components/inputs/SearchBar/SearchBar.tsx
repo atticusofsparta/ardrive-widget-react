@@ -1,5 +1,4 @@
-import { EntityID } from '@atticusofsparta/arfs-lite-client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { SEARCH_TYPES } from '../../../types';
 import { checkSearchType } from '../../../utils/searchUtils';
@@ -11,7 +10,6 @@ function SearchBar({
   isSearching,
   setSearchType,
   setSearchQuery,
-  searchQuery,
 }: {
   searchType?: SEARCH_TYPES;
   setSearchType: (searchType?: SEARCH_TYPES) => void;

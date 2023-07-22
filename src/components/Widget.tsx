@@ -1,8 +1,4 @@
-import {
-  ArFSDriveEntity,
-  ArweaveAddress,
-  EntityID,
-} from '@atticusofsparta/arfs-lite-client';
+import { ArweaveAddress, EntityID } from '@atticusofsparta/arfs-lite-client';
 import Arweave from 'arweave';
 import { useEffect, useState } from 'react';
 
@@ -19,10 +15,10 @@ function Widget({
   customArweave,
   address,
   defaultView = 'search',
-  preferredHideMode = 'dropdown',
+  //preferredHideMode = 'dropdown',
   defaultEntityId,
-  cacheResults = false,
-}: {
+}: //cacheResults = false,
+{
   address?: string | (() => string); // default account to load for drive selector
   defaultEntityId?: string; // default entity to load for drive selector
   customArweave?: Arweave;
@@ -37,16 +33,14 @@ function Widget({
   const [view, setView] = useState<'search' | 'files' | 'drive'>(defaultView);
   const [showMenu, setShowMenu] = useState<boolean>(true);
   const [hideWidget, setHideWidget] = useState<boolean>(true);
-  const [hideMode, setHideMode] = useState<'icon' | 'dropdown' | 'invisible'>(
-    preferredHideMode,
-  );
-  const [currentTheme, setCurrentTheme] = useState<Theme>(DARK_THEME);
-  const [dataMode, setDataMode] = useState<'select' | 'download'>(mode); // what happens when a file is selected
-  const [arweave, setArweave] = useState<Arweave | undefined>(customArweave);
+  // const [hideMode, setHideMode] = useState<'icon' | 'dropdown' | 'invisible'>(
+  //   preferredHideMode,
+  // );
+  const [, setCurrentTheme] = useState<Theme>(DARK_THEME);
+  const [, setDataMode] = useState<'select' | 'download'>(mode); // what happens when a file is selected
+  const [, setArweave] = useState<Arweave | undefined>(customArweave);
   //
-  const [arweaveAddress, setArweaveAddress] = useState<string | undefined>(
-    address,
-  );
+  const [, setArweaveAddress] = useState<string | undefined>(address);
   const [arfsEntityId, setArfsEntityId] = useState<EntityID | undefined>(
     defaultEntityId ? new EntityID(defaultEntityId) : undefined,
   );
