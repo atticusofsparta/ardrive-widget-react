@@ -1,4 +1,11 @@
-import React, { CSSProperties, ReactNode, useEffect, useRef, useState } from 'react';
+import React, {
+  CSSProperties,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
 import './styles.css';
 
 function ScrollContainer({
@@ -29,11 +36,13 @@ function ScrollContainer({
       if (scrollContainer && scrollBar) {
         const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
         const scrollableHeight = scrollHeight - clientHeight;
-        const containerHeight = scrollBarContainerHeight  -  (clientHeight / scrollBarContainerHeight)
+        const containerHeight =
+          scrollBarContainerHeight - clientHeight / scrollBarContainerHeight;
 
         // Calculate the scrollbar size and position
         const size = (containerHeight / scrollHeight) * containerHeight;
-        let position = (scrollTop / scrollableHeight) * (containerHeight - (size));
+        let position =
+          (scrollTop / scrollableHeight) * (containerHeight - size);
 
         // Prevent scrollbar from going past the bottom
         position = Math.min(position, clientHeight - size);
@@ -64,9 +73,23 @@ function ScrollContainer({
   };
 
   return (
-    <div className="scroll-container" style={wrapperStyle} ref={scrollContainerRef}>
-      <div className="scrollbar-container" style={{...scrollBarContainerStyle, height: `${scrollBarContainerHeight}px`}}>
-        <div className="scrollbar" style={scrollbarStyle} ref={scrollBarRef}></div>
+    <div
+      className="scroll-container"
+      style={wrapperStyle}
+      ref={scrollContainerRef}
+    >
+      <div
+        className="scrollbar-container"
+        style={{
+          ...scrollBarContainerStyle,
+          height: `${scrollBarContainerHeight}px`,
+        }}
+      >
+        <div
+          className="scrollbar"
+          style={scrollbarStyle}
+          ref={scrollBarRef}
+        ></div>
       </div>
       <div className="scroll-container-content" style={contentStyle}>
         {children}

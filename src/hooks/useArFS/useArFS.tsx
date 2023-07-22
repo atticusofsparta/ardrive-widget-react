@@ -1,5 +1,4 @@
 import Arweave from 'arweave';
-import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import { DriveStructure } from '../../types';
@@ -21,7 +20,7 @@ function useArFS({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [entityType, setEntityType] = useState<'drive' | 'folder' | 'file'>();
   const [entityId, setEntityId] = useState<string>(); // save entity id to highlight imported file or folder
-  const arweaveDataProvider = useArweaveCompositeDataProvider();
+  const arweaveDataProvider = useArweaveCompositeDataProvider(customArweave);
 
   useEffect(() => {
     //onload

@@ -1,12 +1,17 @@
-import { ArFSDriveEntity, ArweaveAddress, EntityID } from '@atticusofsparta/arfs-lite-client';
+import {
+  ArFSDriveEntity,
+  ArweaveAddress,
+  EntityID,
+} from '@atticusofsparta/arfs-lite-client';
 import Arweave from 'arweave';
 import { useEffect, useState } from 'react';
 
+import useArweaveCompositeDataProvider from '../hooks/useArweaveCompositeDataProvider/useArweaveCompositeDataProvider';
+import ArFSDrive from '../services/ArFSDrive';
 import { ENTITY_TYPES, Theme } from '../types';
 import { DARK_THEME, LIGHT_THEME } from '../utils/constants';
+import CircleProgressBar from './progress/CircleProgressBar/CircleProgressBar';
 import { Files, Menu, Navbar, Search } from './views';
-import ArFSDrive from '../services/ArFSDrive';
-import useArweaveCompositeDataProvider from '../hooks/useArweaveCompositeDataProvider/useArweaveCompositeDataProvider';
 
 function Widget({
   theme = 'dark',
@@ -37,13 +42,18 @@ function Widget({
   );
   const [currentTheme, setCurrentTheme] = useState<Theme>(DARK_THEME);
   const [dataMode, setDataMode] = useState<'select' | 'download'>(mode); // what happens when a file is selected
-  const [arweave, setArweave] = useState<Arweave>();
+  const [arweave, setArweave] = useState<Arweave | undefined>(customArweave);
   //
-  const [arweaveAddress, setArweaveAddress] = useState<string>();
-  const [arfsEntityId, setArfsEntityId] = useState<EntityID>();
+  const [arweaveAddress, setArweaveAddress] = useState<string | undefined>(
+    address,
+  );
+  const [arfsEntityId, setArfsEntityId] = useState<EntityID | undefined>(
+    defaultEntityId ? new EntityID(defaultEntityId) : undefined,
+  );
   const [entityType, setEntityType] = useState<ENTITY_TYPES | undefined>(
     undefined,
   );
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [drive, setDrive] = useState<ArFSDrive>();
 
@@ -78,68 +88,87 @@ function Widget({
   }, [theme, address, mode, customArweave, defaultEntityId, defaultView]);
 
   useEffect(() => {
-    if (arfsEntityId) {
-        updateDrive(arfsEntityId)
-        return
+    if (arfsEntityId && arfsEntityId.toString().length > 0) {
+      updateDrive(arfsEntityId);
+      return;
     }
- 
-      setDrive(undefined)
-  
-  
-  },[arfsEntityId])
 
+    setDrive(undefined);
+  }, [arfsEntityId]);
 
-  async function updateDrive(id:EntityID) {
+  async function updateDrive(id: EntityID) {
     try {
+      setLoading(true);
+      if (entityType === ENTITY_TYPES.DRIVE && id) {
+        const owner = await arweaveDataProvider._ArFSClient.getOwnerForDriveId(
+          id,
+        );
+        const driveEntity =
+          await arweaveDataProvider._ArFSClient.getPublicDrive({
+            driveId: id,
+            owner,
+          });
 
-      if (entityType === ENTITY_TYPES.DRIVE && id){
-        const owner = await arweaveDataProvider._ArFSClient.getOwnerForDriveId(id)
-        const driveEntity = await arweaveDataProvider._ArFSClient.getPublicDrive({driveId: id, owner})
-  
-        const newDrive = await arweaveDataProvider.buildDrive(driveEntity)
-        setDrive(newDrive)
+        const newDrive = await arweaveDataProvider.buildDrive(driveEntity);
+        setDrive(newDrive);
       }
-      if (entityType === ENTITY_TYPES.FOLDER && id){
-        const entityTypeResult = await arweaveDataProvider.getEntityType(id)
-        if (!entityTypeResult || entityTypeResult.type !== ENTITY_TYPES.FOLDER) {
-          throw new Error('Invalid entity type')
+      if (entityType === ENTITY_TYPES.FOLDER && id) {
+        const entityTypeResult = await arweaveDataProvider.getEntityType(id);
+        if (
+          !entityTypeResult ||
+          entityTypeResult.type !== ENTITY_TYPES.FOLDER
+        ) {
+          throw new Error('Invalid entity type');
         }
-        const folderEntity = await arweaveDataProvider._ArFSClient.getPublicFolder({folderId: id, owner: new ArweaveAddress(entityTypeResult.owner)})
-        const driveEntity = await arweaveDataProvider._ArFSClient.getPublicDrive({driveId: folderEntity.driveId, owner: new ArweaveAddress(entityTypeResult.owner)})
-        const newDrive = await arweaveDataProvider.buildDrive(driveEntity)
-        setDrive(newDrive)
-
+        const folderEntity =
+          await arweaveDataProvider._ArFSClient.getPublicFolder({
+            folderId: id,
+            owner: new ArweaveAddress(entityTypeResult.owner),
+          });
+        const driveEntity =
+          await arweaveDataProvider._ArFSClient.getPublicDrive({
+            driveId: new EntityID(
+              JSON.parse(JSON.stringify(folderEntity.driveId))['entityId'],
+            ),
+            owner: new ArweaveAddress(entityTypeResult.owner),
+          });
+        const newDrive = await arweaveDataProvider.buildDrive(driveEntity);
+        setDrive(newDrive);
       }
-      if (entityType === ENTITY_TYPES.FILE && id){
-        const entityTypeResult = await arweaveDataProvider.getEntityType(id)
+      if (entityType === ENTITY_TYPES.FILE && id) {
+        const entityTypeResult = await arweaveDataProvider.getEntityType(id);
         if (!entityTypeResult || entityTypeResult.type !== ENTITY_TYPES.FILE) {
-          throw new Error('Invalid entity type')
+          throw new Error('Invalid entity type');
         }
-        const fileEntity = await arweaveDataProvider._ArFSClient.getPublicFile({fileId: id, owner: new ArweaveAddress(entityTypeResult.owner)})
-        console.log(fileEntity.driveId, entityTypeResult.owner)
-        const driveEntity = await arweaveDataProvider._ArFSClient.getPublicDrive({driveId: fileEntity.driveId, owner: new ArweaveAddress(entityTypeResult.owner)})
-        const newDrive = await arweaveDataProvider.buildDrive(driveEntity)
-        setDrive(newDrive)
+        const fileEntity = await arweaveDataProvider._ArFSClient.getPublicFile({
+          fileId: id,
+          owner: new ArweaveAddress(entityTypeResult.owner),
+        });
+        const driveEntity =
+          await arweaveDataProvider._ArFSClient.getPublicDrive({
+            driveId: new EntityID(
+              JSON.parse(JSON.stringify(fileEntity.driveId))['entityId'],
+            ),
+            owner: new ArweaveAddress(entityTypeResult.owner),
+          });
+        const newDrive = await arweaveDataProvider.buildDrive(driveEntity);
+        setDrive(newDrive);
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     } finally {
-      console.log(drive)
-      if (drive) {
-        setView('files')
-      }
+      setView('files');
+      setLoading(false);
     }
-
   }
 
-  function getDefaultAddress (address: string |( () => string)) {
+  function getDefaultAddress(address: string | (() => string)) {
     if (typeof address === 'function') {
       return address();
     } else {
       return address;
     }
   }
-  
 
   return (
     <>
@@ -152,21 +181,34 @@ function Widget({
             setShowMenu={setShowMenu}
           />
 
-          <div className="viewContainer">
-            {view === 'search' ? (
-              <Search 
-              addressCallback={(address)=> setArweaveAddress(address)}
-              entityIdCallback={(entityId) => setArfsEntityId(new EntityID(entityId.toString()))}
-              entityTypeCallback={(type: ENTITY_TYPES | undefined) => setEntityType(type)}
-              defaultAddress={address ? getDefaultAddress(address) : undefined}
-              defaultEntityId={defaultEntityId}
-              />
-            ) : view === 'files' ? (
-              <Files
-              drive={drive}
-              />
+          <div className="viewContainer fade-in">
+            {!loading ? (
+              view === 'search' ? (
+                <Search
+                  addressCallback={(address) => setArweaveAddress(address)}
+                  entityIdCallback={(entityId) =>
+                    setArfsEntityId(new EntityID(entityId.toString()))
+                  }
+                  entityTypeCallback={(type?: ENTITY_TYPES) =>
+                    setEntityType(type)
+                  }
+                  defaultAddress={
+                    address ? getDefaultAddress(address) : undefined
+                  }
+                  defaultEntityId={defaultEntityId}
+                />
+              ) : view === 'files' ? (
+                <Files drive={drive} />
+              ) : (
+                <></>
+              )
             ) : (
-              <></>
+              <div
+                className="flex-column center"
+                style={{ marginTop: '110px' }}
+              >
+                <CircleProgressBar size={80} color="white" />
+              </div>
             )}
 
             {showMenu ? (

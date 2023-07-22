@@ -31,31 +31,30 @@ function SearchBar({
 
   async function handleChange(e: any) {
     e.preventDefault();
-    setSearchType(undefined);
 
     const search = e.target.value;
-    if (search === '') {
+    if (search === '' || !search.length) {
       reset();
       return;
     }
     const type = checkSearchType(search.trim());
     setSearchType(type);
     setSearchBarText(search);
-
     if (!type) {
       setIsSearchValid(false);
       return;
     }
+
+    onSubmit(search.trim());
     setIsSearchValid(true);
   }
 
-  async function onSubmit(e: any) {
-    e.preventDefault();
-    if (searchBarText === '') {
+  async function onSubmit(query: string) {
+    if (query === '') {
       reset();
       return;
     }
-    setSearchQuery(searchBarText);
+    setSearchQuery(query);
     setIsSearchValid(true);
   }
 
@@ -79,7 +78,7 @@ function SearchBar({
         placeholder={`Enter an ArFS Entity ID or Arweave Address`}
         value={searchBarText}
         onChange={(e) => handleChange(e)}
-        onKeyDown={(e) => (e.key === 'Enter' ? onSubmit(e) : null)}
+        onKeyDown={(e) => (e.key === 'Enter' ? onSubmit(searchBarText) : null)}
         maxLength={43}
       />
       {isSearching ? (
@@ -90,7 +89,7 @@ function SearchBar({
         <button
           className="hollowButton"
           style={{ border: 'none', cursor: 'pointer' }}
-          onClick={(e) => onSubmit(e)}
+          onClick={() => onSubmit(searchBarText)}
         >
           <SearchIcon width="15px" height="15px" fill="black" />
         </button>

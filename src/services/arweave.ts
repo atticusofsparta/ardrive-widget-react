@@ -72,7 +72,7 @@ export const buildQuery = ({
   const queryObject = {
     query: `{
       transactions(first:${modifiers?.first ?? 100},sort:${
-      modifiers?.sort ?? 'HEIGHT_DESC'
+      modifiers?.sort ?? 'HEIGHT_ASC'
     }
         tags: [{
             name: "${tags[0].name}",

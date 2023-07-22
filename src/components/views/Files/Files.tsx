@@ -43,6 +43,7 @@ function Files({ drive }: { drive?: ArFSDrive }) {
       }}
     >
       <div
+        className="fade-in"
         style={{
           display: 'flex',
           flexDirection: 'column',

@@ -30,7 +30,7 @@ export function isArFSID(id?: string) {
   return ARFS_ID_REGEX.test(id);
 }
 
-export function formatByteCount(byteCount:number) {
+export function formatByteCount(byteCount: number) {
   const byteCountTypes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
   const base = 1024;
   let count = +byteCount;

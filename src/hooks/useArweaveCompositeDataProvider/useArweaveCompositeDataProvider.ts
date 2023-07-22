@@ -16,10 +16,8 @@ const DEFAULT_PROVIDER = new ArweaveCompositeDataProvider({
 });
 
 function useArweaveCompositeDataProvider(customArweave?: Arweave) {
-  
-  const [dataProvider, setDataProvider] = useState<
-    ArweaveCompositeDataProvider
-  >(DEFAULT_PROVIDER);
+  const [dataProvider, setDataProvider] =
+    useState<ArweaveCompositeDataProvider>(DEFAULT_PROVIDER);
 
   useEffect(() => {
     if (customArweave) {
@@ -34,7 +32,6 @@ function useArweaveCompositeDataProvider(customArweave?: Arweave) {
         console.error(error);
       }
     }
-
   }, [customArweave]);
 
   return dataProvider;
