@@ -11,17 +11,21 @@
     "lint:fix": "eslint --fix .",
     "lint:check": "eslint .",
     "preview": "vite preview",
-    "test": "NODE_ENV=test jest"
+    "test": "NODE_ENV=test jest",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "@atticusofsparta/arfs-lite-client": "../arfs-lite-client/dist",
+    "@atticusofsparta/arfs-lite-client": "^1.1.1",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@radix-ui/react-popover": "^1.0.6",
     "@rollup/plugin-inject": "^5.0.3",
     "@typescript-eslint/parser": "^5.0.0",
     "arweave": "1.13.7",
     "buffer": "^6.0.3",
     "events": "^3.3.0",
+    "gh-pages": "^5.0.0",
     "process": "^0.11.10",
+    "rc-pagination": "^3.5.0",
     "rc-table": "^7.32.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

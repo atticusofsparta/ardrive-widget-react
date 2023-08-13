@@ -48,6 +48,7 @@ button {
   border-radius: 24px;
   transition: all 0.2s ease-in-out;
   font-family: 'Wavehaus';
+  justify-content: space-between;
 }
 .widget-hidden {
   box-sizing: border-box;
@@ -66,11 +67,7 @@ button {
   display: flex;
   flex-direction: column;
   position: relative;
-  margin-top: 40px;
   box-sizing: border-box;
-  margin-bottom: 0px;
-  overflow: hidden;
-  padding: 7px;
 }
 
 .flex-row {
@@ -190,8 +187,9 @@ button {
 .hover:hover {
   color: var(--primary);
   fill: var(--primary) !important;
-  border-color: var(--primary);
+  border: 1px solid var(--primary) !important;
   transition: all 0.2s ease-in-out;
+  cursor: pointer !important;
 }
 
 .button {
@@ -205,6 +203,33 @@ button {
 
 .fade-in {
   animation: fadeIn ease 0.8s;
+}
+.rc-pagination > li {
+  list-style: none;
+  width: fit-content;
+  padding: 5px;
+  border-radius: 2px;
+  color: var(--text-subtle);
+  font-weight: 200;
+  font-size: 14px;
+  cursor: pointer;
+  fill: var(--text-subtle);
+}
+.rc-pagination-item-active {
+  color: var(--foreground-muted) !important; 
+  fill: var(--foreground-muted) !important;
+}
+
+.rc-pagination > li:hover {
+  color: var(--primary);
+  fill: var(--primary) !important;
+}
+
+.rc-pagination-next:hover , .rc-pagination-prev:hover {
+  color: var(--primary);
+  fill: var(--primary) !important;
+  scale: 1.33 !important;
+  transition: all 0.2s ease-in-out;
 }
 
 @keyframes fadeIn {

@@ -48,6 +48,7 @@ function Widget({
     undefined,
   );
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadPercentage, setLoadPercentage] = useState<number>(0);
 
   const [drive, setDrive] = useState<ArFSDrive>();
 
@@ -93,7 +94,11 @@ function Widget({
   async function updateDrive(id: EntityID) {
     try {
       setLoading(true);
+      setView('files');
       if (entityType === ENTITY_TYPES.DRIVE && id) {
+        // TODO: setup event listeners to get loading feedback from the arfs client91
+        // const cachedEntities = await getCachedItemsByDriveId(id.toString())
+        // console.log(cachedEntities)
         const owner = await arweaveDataProvider._ArFSClient.getOwnerForDriveId(
           id,
         );
@@ -150,8 +155,8 @@ function Widget({
       }
     } catch (error) {
       console.error(error);
+      setView("search")
     } finally {
-      setView('files');
       setLoading(false);
     }
   }
@@ -177,6 +182,15 @@ function Widget({
 
           <div className="viewContainer fade-in">
             {!loading ? (
+              showMenu ? (
+                <Menu
+                  hideWidget={hideWidget}
+                  setHideWidget={setHideWidget}
+                  setShowMenu={setShowMenu}
+                  setView={setView}
+                  view={view}
+                />
+              ) :
               view === 'search' ? (
                 <Search
                   addressCallback={(address) => setArweaveAddress(address)}
@@ -192,29 +206,20 @@ function Widget({
                   defaultEntityId={defaultEntityId}
                 />
               ) : view === 'files' ? (
-                <Files drive={drive} />
+                <Files drive={drive} loadingDrive={loading} loadPercentage={loadPercentage} />
               ) : (
                 <></>
               )
             ) : (
               <div
-                className="flex-column center"
-                style={{ marginTop: '110px' }}
-              >
-                <CircleProgressBar size={80} color="white" />
-              </div>
-            )}
-
-            {showMenu ? (
-              <Menu
-                hideWidget={hideWidget}
-                setHideWidget={setHideWidget}
-                setShowMenu={setShowMenu}
-                setView={setView}
-                view={view}
-              />
-            ) : (
-              <></>
+              className="flex-column center"
+              style={{ height: '100%', marginTop: '-75%', marginLeft:"70px", marginRight:"auto", position: 'absolute' }}
+            >
+              <span className="textLarge white" style={{ display:'flex', justifyContent:"center", position:"absolute", top:"110px" }}>
+                Loading Drive...
+              </span>
+              <CircleProgressBar size={250} color="var(--primary)" />
+            </div>
             )}
           </div>
         </div>

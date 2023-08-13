@@ -43,3 +43,42 @@ export function formatByteCount(byteCount: number) {
 
   return `${count.toFixed(1)} ${byteCountTypes[typeIndex]}`;
 }
+
+
+export async function getCachedItemsByDriveId(driveId: string): Promise<any[]> {
+  return new Promise<any[]>((resolve, reject) => {
+    const dbOpenRequest = indexedDB.open('arfs-entity-cache-db', 1);
+
+    dbOpenRequest.onerror = (_event: Event) => {
+      reject("Error opening database");
+    };
+
+    dbOpenRequest.onsuccess = (event: Event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      const transaction = db.transaction('cache', 'readonly');
+      const objectStore = transaction.objectStore('cache');
+
+      const items: any[] = [];
+      const cursorRequest = objectStore.openCursor();
+
+      cursorRequest.onsuccess = (event: Event) => {
+        const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+        if (cursor) {
+         
+          const itemDriveId = cursor.value.value.driveId?.entityId; // Assuming 'driveId' is an object with 'entityId'
+          if (itemDriveId === driveId) {
+            items.push(cursor.value);
+          }
+          cursor.continue();
+        } else {
+          resolve(items);
+        }
+      };
+
+      cursorRequest.onerror = (_event: Event) => {
+        reject("Error querying by drive ID");
+      };
+    };
+  });
+}
+

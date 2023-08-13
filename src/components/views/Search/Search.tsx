@@ -214,22 +214,11 @@ function Search({
     }
   }
 
-  if (isSearching) {
-    return (
-      <div
-        className="flex-column center"
-        style={{ width: '100%', height: '100%', marginTop: 110 }}
-      >
-        <CircleProgressBar size={80} color="white" />
-      </div>
-    );
-  }
-
   return (
     <>
       <div
         className="flex-column space-between fade-in"
-        style={{ height: '100%', width: '100%', position: 'relative' }}
+        style={{width: '100%', position: 'relative', height: '350px' }}
       >
         <div className="flex-column gap" style={{ height: '100%' }}>
           {!searchResults ? (
@@ -393,7 +382,6 @@ function Search({
             ) : (
               <span
                 className="faded flex-column center"
-                style={{ height: '100%' }}
               >
                 <CircleProgressBar size={80} color="white" />
               </span>

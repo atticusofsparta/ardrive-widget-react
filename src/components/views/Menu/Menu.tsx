@@ -22,7 +22,7 @@ function Menu({
   setHideWidget: Dispatch<SetStateAction<boolean>>;
 }) {
   return (
-    <div className="menu flex-column gap1 fade-in">
+    <div className="menu flex-column gap1">
       <button
         className="menuItem"
         onClick={() => {
