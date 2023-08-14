@@ -198,11 +198,13 @@ function Search({
         entityTypeCallback(ENTITY_TYPES.FOLDER);
         entityIdCallback(result.folderId.entityId.toString());
         addressCallback(result.owner);
+        return
       }
       if (Object.keys(result).includes('fileId')) {
         entityTypeCallback(ENTITY_TYPES.FILE);
         entityIdCallback(result.fileId.entityId.toString());
         addressCallback(result.owner);
+        return
       }
       if (Object.keys(result).includes('driveId')) {
         entityTypeCallback(ENTITY_TYPES.DRIVE);

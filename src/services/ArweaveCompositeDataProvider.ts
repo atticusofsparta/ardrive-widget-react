@@ -1,6 +1,8 @@
 import {
   ArFSClientType,
   ArFSDriveEntity,
+  ArFSPublicFile,
+  ArFSPublicFolder,
   ArweaveAddress,
   EntityID,
 } from '@atticusofsparta/arfs-lite-client';
@@ -42,6 +44,63 @@ class ArweaveCompositeDataProvider implements ArFSDataProvider {
     });
 
     return new ArFSDrive(drive, folders, files);
+  }
+
+  async buildDriveForFolder(folder: ArFSPublicFolder): Promise<ArFSDrive> {
+    const owner = await this._ArFSClient.getOwnerForDriveId(folder.driveId);
+    const drive = await this._ArFSClient.getPublicDrive({
+      driveId: new EntityID(JSON.parse(JSON.stringify(folder.driveId))['entityId']),
+      owner: new ArweaveAddress(JSON.parse(JSON.stringify(owner))['address']),
+    });
+  
+    const folderID = new EntityID(JSON.parse(JSON.stringify(folder.entityId)).entityId);
+    const allFolders = await this._ArFSClient.getAllFoldersOfPublicDrive({
+      driveId: new EntityID(JSON.parse(JSON.stringify(drive.driveId))['entityId']),
+      owner: new ArweaveAddress(JSON.parse(JSON.stringify(owner))['address']),
+      latestRevisionsOnly: true,
+    });
+  
+    const filteredFolders: ArFSPublicFolder[] = [];
+    const subFolderIDs: Set<EntityID> = new Set(); // To keep track of unique subfolder IDs
+  
+    for (const f of allFolders) {
+      if (f.parentFolderId.toString() === folderID.toString()) {
+        filteredFolders.push(f);
+        subFolderIDs.add(f.entityId);
+      } else if (subFolderIDs.has(f.parentFolderId)) {
+        filteredFolders.push(f);
+        subFolderIDs.add(f.entityId);
+      }
+    }
+  
+    const folderIDs = [...subFolderIDs, folderID];
+  
+    const files = await this._ArFSClient.getPublicFilesWithParentFolderIds({
+      folderIDs: folderIDs,
+      owner: new ArweaveAddress(JSON.parse(JSON.stringify(owner))['address']),
+      latestRevisionsOnly: true,
+    });
+  
+    return new ArFSDrive(drive, [...filteredFolders, folder], files);
+  }
+  
+
+  async buildDriveForFile(file: ArFSPublicFile): Promise<ArFSDrive> {
+    const owner = await this._ArFSClient.getOwnerForDriveId(file.driveId);
+    const drive = await this._ArFSClient.getPublicDrive({
+      driveId: new EntityID(
+        JSON.parse(JSON.stringify(file.driveId))['entityId'],
+      ),
+      owner: new ArweaveAddress(JSON.parse(JSON.stringify(owner))['address']),
+    });
+    const folder = await this._ArFSClient.getPublicFolder({
+      folderId: new EntityID(
+        JSON.parse(JSON.stringify(file.parentFolderId))['entityId'],
+      ),
+      owner: new ArweaveAddress(JSON.parse(JSON.stringify(owner))['address']),
+    });
+
+    return new ArFSDrive(drive, [folder], [file]);
   }
 
   async getEntityType(

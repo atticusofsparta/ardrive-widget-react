@@ -8,6 +8,7 @@ import { ENTITY_TYPES, Theme } from '../types';
 import { DARK_THEME, LIGHT_THEME } from '../utils/constants';
 import CircleProgressBar from './progress/CircleProgressBar/CircleProgressBar';
 import { Files, Menu, Navbar, Search } from './views';
+import WidgetHidden from './views/WidgetHidden/WidgetHidden';
 
 function Widget({
   theme = 'dark',
@@ -15,9 +16,9 @@ function Widget({
   customArweave,
   address,
   defaultView = 'search',
-  //preferredHideMode = 'dropdown',
+  preferredHideMode = 'icon',
   defaultEntityId,
-}: //cacheResults = false,
+}:
 {
   address?: string | (() => string); // default account to load for drive selector
   defaultEntityId?: string; // default entity to load for drive selector
@@ -27,7 +28,6 @@ function Widget({
   theme?: 'light' | 'dark' | Theme; // light, dark, or custom theme
   defaultView?: 'search' | 'files' | 'drive'; // default view to show when widget is opened
   preferredHideMode?: 'icon' | 'dropdown' | 'invisible'; // widget hide behavior
-  cacheResults?: boolean; // whether or not to cache results
 }) {
   const arweaveDataProvider = useArweaveCompositeDataProvider(customArweave);
   const [view, setView] = useState<'search' | 'files' | 'drive'>(defaultView);
@@ -48,7 +48,7 @@ function Widget({
     undefined,
   );
   const [loading, setLoading] = useState<boolean>(false);
-  const [loadPercentage, setLoadPercentage] = useState<number>(0);
+  const [loadPercentage] = useState<number>(0);
 
   const [drive, setDrive] = useState<ArFSDrive>();
 
@@ -99,6 +99,7 @@ function Widget({
         // TODO: setup event listeners to get loading feedback from the arfs client91
         // const cachedEntities = await getCachedItemsByDriveId(id.toString())
         // console.log(cachedEntities)
+        
         const owner = await arweaveDataProvider._ArFSClient.getOwnerForDriveId(
           id,
         );
@@ -124,14 +125,8 @@ function Widget({
             folderId: id,
             owner: new ArweaveAddress(entityTypeResult.owner),
           });
-        const driveEntity =
-          await arweaveDataProvider._ArFSClient.getPublicDrive({
-            driveId: new EntityID(
-              JSON.parse(JSON.stringify(folderEntity.driveId))['entityId'],
-            ),
-            owner: new ArweaveAddress(entityTypeResult.owner),
-          });
-        const newDrive = await arweaveDataProvider.buildDrive(driveEntity);
+
+        const newDrive = await arweaveDataProvider.buildDriveForFolder(folderEntity);
         setDrive(newDrive);
       }
       if (entityType === ENTITY_TYPES.FILE && id) {
@@ -143,14 +138,8 @@ function Widget({
           fileId: id,
           owner: new ArweaveAddress(entityTypeResult.owner),
         });
-        const driveEntity =
-          await arweaveDataProvider._ArFSClient.getPublicDrive({
-            driveId: new EntityID(
-              JSON.parse(JSON.stringify(fileEntity.driveId))['entityId'],
-            ),
-            owner: new ArweaveAddress(entityTypeResult.owner),
-          });
-        const newDrive = await arweaveDataProvider.buildDrive(driveEntity);
+
+        const newDrive = await arweaveDataProvider.buildDriveForFile(fileEntity);
         setDrive(newDrive);
       }
     } catch (error) {
@@ -194,9 +183,9 @@ function Widget({
               view === 'search' ? (
                 <Search
                   addressCallback={(address) => setArweaveAddress(address)}
-                  entityIdCallback={(entityId) =>
+                  entityIdCallback={(entityId) => {
                     setArfsEntityId(new EntityID(entityId.toString()))
-                  }
+                  }}
                   entityTypeCallback={(type?: ENTITY_TYPES) =>
                     setEntityType(type)
                   }
@@ -206,7 +195,7 @@ function Widget({
                   defaultEntityId={defaultEntityId}
                 />
               ) : view === 'files' ? (
-                <Files drive={drive} loadingDrive={loading} loadPercentage={loadPercentage} />
+                <Files drive={drive} loadingDrive={loading} loadPercentage={loadPercentage} startFolder={entityType === 'folder' ? arfsEntityId : undefined} />
               ) : (
                 <></>
               )
@@ -224,14 +213,13 @@ function Widget({
           </div>
         </div>
       ) : (
-        <div className="widget-hidden">
-          <Navbar
-            hideWidget={hideWidget}
-            setHideWidget={setHideWidget}
-            showMenu={showMenu}
-            setShowMenu={setShowMenu}
-          />
-        </div>
+        <WidgetHidden 
+        mode={preferredHideMode}
+        hideWidget={hideWidget}
+        setHideWidget={setHideWidget}
+        showMenu={showMenu}
+        setShowMenu={setShowMenu}
+        />
       )}
     </>
   );

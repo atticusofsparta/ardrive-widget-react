@@ -28,8 +28,10 @@ import { ReactComponent as ProgressCircleQuarter } from './ProgressCircleQuarter
 import { ReactComponent as SearchIcon } from './Search.svg';
 import { ReactComponent as SettingsIcon } from './Settings.svg';
 import { ReactComponent as VideoIcon } from './Video.svg';
+import { ReactComponent as ArDriveStackIcon } from './ardrive_stack_icon.svg';
 
 export {
+  ArDriveStackIcon,
   BookIcon,
   ChevronDownIcon,
   CircleCheckIcon,
