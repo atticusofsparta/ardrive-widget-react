@@ -1,4 +1,4 @@
-import { EntityID } from '@atticusofsparta/arfs-lite-client';
+import { ArFSPublicFolder, EntityID } from '@atticusofsparta/arfs-lite-client';
 import * as Popover from '@radix-ui/react-popover';
 import Pagination from 'rc-pagination';
 import Table from 'rc-table';
@@ -34,6 +34,7 @@ function Files({
 
   useEffect(() => {
     if (drive && !currentFolder) {
+      // TODO: fix loading for file only drives here. Need to add parent folder logic as startFolder.
       setCurrentFolder(
         new EntityID(drive._driveEntity.rootFolderId.toString()),
       );
@@ -64,7 +65,7 @@ function Files({
   }
 
   function getParentOfParentFolder(parentFolderId?: EntityID) {
-    if (startFolder?.toString() === parentFolderId?.toString()) {
+    if (startFolder && startFolder.toString() === parentFolderId?.toString()) {
       return;
     }
     if (!parentFolderId || parentFolderId.toString() === 'root folder') {
@@ -95,8 +96,13 @@ function Files({
 
   function getNameForId(id: EntityID) {
 
-    const entity = drive?._folderEntities.find((folder) => {
-      return JSON.parse(JSON.stringify(folder.entityId)).entityId === id?.toString();
+    const entity = drive?._folderEntities.find((folder:ArFSPublicFolder) => {
+      console.log(folder)
+      // TODO: this is a bug with loading folders vs drives. Clean works for drives, dirty for folders. Fix this disgusting code when possible.
+      const cleanResult = folder.entityId.toString() === id?.toString() 
+      if (cleanResult) return cleanResult
+      const dirtyResult = JSON.parse(JSON.stringify(folder.entityId))["entityId"] === id?.toString();
+      return dirtyResult;
     });
     console.log(entity, id)
     return entity?.name;

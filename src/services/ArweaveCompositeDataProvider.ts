@@ -47,7 +47,7 @@ class ArweaveCompositeDataProvider implements ArFSDataProvider {
   }
 
   async buildDriveForFolder(folder: ArFSPublicFolder): Promise<ArFSDrive> {
-    const owner = await this._ArFSClient.getOwnerForDriveId(folder.driveId);
+    const owner = await this._ArFSClient.getOwnerForDriveId(JSON.parse(JSON.stringify(folder.driveId))['entityId']);
     const drive = await this._ArFSClient.getPublicDrive({
       driveId: new EntityID(JSON.parse(JSON.stringify(folder.driveId))['entityId']),
       owner: new ArweaveAddress(JSON.parse(JSON.stringify(owner))['address']),
