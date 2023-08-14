@@ -15,7 +15,7 @@ import './styles.css';
 function Files({
   drive,
   loadingDrive,
-  loadPercentage,
+  // loadPercentage,
   startFolder,
 }: {
   drive?: ArFSDrive;
@@ -25,12 +25,14 @@ function Files({
 }) {
   const { rows, columns, expandRow, expandedRowKey } = useFilesTable(drive);
   const [fileData, setFileData] = useState<any[]>([]);
+  const [paginatedFileData, setPaginatedFileData] = useState<any[]>([]);
   const [fileColumns, setFileColumns] = useState<any[]>([]);
   const [currentFolder, setCurrentFolder] = useState<EntityID | undefined>(
     startFolder,
   );
   const [drivePath, setDrivePath] = useState<EntityID[]>([]);
   const [page, setPage] = useState<number>(1);
+  const [itemsPerPage] = useState<number>(20);
 
   useEffect(() => {
     if (drive && !currentFolder) {
@@ -42,8 +44,10 @@ function Files({
     setFileData(updateRows(rows));
     setFileColumns(columns);
     setDrivePath(currentFolder ? updateDrivePath(currentFolder) : []);
+    updatePages(1);
 
   }, [rows, currentFolder, startFolder]);
+  
 
   function updateRows(rows: any[]) {
     const filteredRows = rows.filter((row) => {
@@ -106,6 +110,15 @@ function Files({
     });
     console.log(entity, id)
     return entity?.name;
+  }
+
+  function updatePages(pageNumber: number) {
+
+    setPage(pageNumber);
+    const start = (pageNumber - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    setPaginatedFileData(updateRows(rows).slice(start, end));
+
   }
 
   function PathPopup({ paths }: { paths: EntityID[] }) {
@@ -228,10 +241,10 @@ function Files({
             : ''}
         </span>
         <Pagination
-          pageSize={10}
+          pageSize={itemsPerPage}
           total={fileData.length}
           current={page}
-          onChange={(page) => setPage(page)}
+          onChange={(page) => updatePages(page)}
           prevIcon={
             <ChevronDownIcon
               width={10}
@@ -281,13 +294,13 @@ function Files({
       >
         <ScrollContainer
           scrollBarContainerStyle={
-            fileData.length > 4 ? { top: '70px' } : { display: 'none' }
+            paginatedFileData.length > 4 ? { top: '70px' } : { display: 'none' }
           }
           scrollBarContainerHeight={260}
         >
           <Table
             columns={fileColumns}
-            data={fileData}
+            data={paginatedFileData}
             prefixCls="files-table"
             rowClassName="files-table-row"
             tableLayout="auto"
