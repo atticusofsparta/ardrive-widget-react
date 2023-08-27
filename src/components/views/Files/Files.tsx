@@ -37,9 +37,7 @@ function Files({
   useEffect(() => {
     if (drive && !currentFolder) {
       // TODO: fix loading for file only drives here. Need to add parent folder logic as startFolder.
-      setCurrentFolder(
-        new EntityID(drive._driveEntity.rootFolderId.toString()),
-      );
+      setCurrentFolder(drive._driveEntity.rootFolderId);
     }
     setFileData(updateRows(rows));
     setFileColumns(columns);
@@ -101,11 +99,13 @@ function Files({
   function getNameForId(id: EntityID) {
 
     const entity = drive?._folderEntities.find((folder:ArFSPublicFolder) => {
-      console.log(folder)
       // TODO: this is a bug with loading folders vs drives. Clean works for drives, dirty for folders. Fix this disgusting code when possible.
       const cleanResult = folder.entityId.toString() === id?.toString() 
+      console.log(folder, id, drive._driveEntity)
+      console.log(cleanResult, id)
       if (cleanResult) return cleanResult
-      const dirtyResult = JSON.parse(JSON.stringify(folder.entityId))["entityId"] === id?.toString();
+      const dirtyResult = folder.entityId.toString() === id?.toString();
+      console.log(dirtyResult, id)
       return dirtyResult;
     });
     console.log(entity, id)
@@ -236,7 +236,7 @@ function Files({
             ? ' / ' +
               getNameForId(
                 currentFolder ??
-                  new EntityID(drive?._driveEntity.rootFolderId.entityId),
+                  drive?._driveEntity.rootFolderId,
               )
             : ''}
         </span>
@@ -313,9 +313,7 @@ function Files({
             onRow={(record) => ({
               onClick: () => {
                 if (record.entityType === 'folder') {
-                  setCurrentFolder(
-                    new EntityID(record.entityId.entityId.toString()),
-                  );
+                  setCurrentFolder(record.entityId);
                   return;
                 }
                 expandRow(record);
