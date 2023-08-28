@@ -40,7 +40,6 @@ function Files({
     if (drive && !currentFolder) {
       // TODO: fix loading for file only drives here. Need to add parent folder logic as startFolder.
       setCurrentFolder(new EntityID(drive._driveEntity.rootFolderId.entityId));
-      console.log(drive._driveEntity.rootFolderId);
     }
 
     setFileData(updateRows(rows));

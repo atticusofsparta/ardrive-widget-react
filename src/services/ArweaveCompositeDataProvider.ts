@@ -40,7 +40,6 @@ class ArweaveCompositeDataProvider implements ArFSDataProvider {
       owner,
       latestRevisionsOnly: true,
     });
-    console.log(drive)
 
     return new ArFSDrive(drive, folders, files);
   }
@@ -91,8 +90,6 @@ class ArweaveCompositeDataProvider implements ArFSDataProvider {
       owner
     })
     const folderId = file.parentFolderId.toString() === "root folder" ? drive.rootFolderId : file.parentFolderId;
-    console.log("root folder ID: ", drive.rootFolderId)
-    console.log(drive, file, folderId)
     const folder = await this._ArFSClient.getPublicFolder({
       folderId,
       owner,
