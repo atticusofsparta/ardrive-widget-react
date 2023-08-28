@@ -82,3 +82,40 @@ export async function getCachedItemsByDriveId(driveId: string): Promise<any[]> {
   });
 }
 
+/**
+ * Decodes a Base64-encoded JSON Data URI string.
+ * @param {string} dataUri - The Data URI string to decode and parse.
+ * @returns {any} - The parsed JSON object.
+ * @throws {Error} - Throws an error if the Data URI is invalid or if JSON parsing fails.
+ */
+export function decodeJsonDataUri(dataUri: string): any {
+  // Validate Data URI scheme
+  const schemePattern = /^data:application\/json;base64,/;
+  if (!schemePattern.test(dataUri)) {
+    throw new Error("Invalid Data URI scheme. Must be 'data:application/json;base64,'");
+  }
+
+  // Extract the Base64-encoded part
+  const base64String = dataUri.replace(schemePattern, "");
+
+  // Decode the Base64 string
+  const decodedString = atob(base64String);
+
+  // Parse the JSON string
+  try {
+    return JSON.parse(decodedString);
+  } catch (error) {
+    throw new Error(`An error occurred while parsing JSON: ${error}`);
+  }
+}
+
+export function decodeStringDataUri(dataUri: string): any {
+  
+  // Extract the Base64-encoded part
+  const base64String = dataUri.split(',')[1];
+
+  // Decode the Base64 string
+  return atob(base64String);
+
+}
+

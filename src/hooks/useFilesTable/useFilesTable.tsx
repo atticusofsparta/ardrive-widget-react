@@ -67,25 +67,21 @@ function useFilesTable(drive?: ArFSDrive) {
         title: 'Date',
         dataIndex: 'date',
         key: 'date',
-        render: (date: number, record:any) => { 
+        render: (date: number) => { 
 
           return (
           <div className="flex-column white" style={{ gap: '5px' }}>
             <span style={{ fontSize: '12px' }}>
-              {Intl.DateTimeFormat('en', {
+              
+            </span>
+            <span style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>
+            {Intl.DateTimeFormat('en', {
               year: 'numeric',
               month: 'numeric',
               day: '2-digit',
             }).format(+date ?? Date.now())
               .split('/')
-              .join('-')}
-            </span>
-            <span style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>
-              {Intl.DateTimeFormat('en', {
-                timeStyle: 'short',
-                timeZone: 'GMT',
-                hour12: false,
-              }).format(date)}{' '}
+              .join('-')}{' '}
               GMT
             </span>
           </div>
@@ -142,9 +138,9 @@ function useFilesTable(drive?: ArFSDrive) {
               ? getFileCountForFolder(entity.folderId)
               : entity.size,
           date:
-            +entity.lastModifiedDate > 0
-              ? +entity.lastModifiedDate
-              : +entity.unixTime * 1000,
+            +entity.lastModifiedDate.valueOf() > 0
+              ? +entity.lastModifiedDate.valueOf()
+              : +entity.unixTime.valueOf() * 1000,
           key: entity.entityId.toString(),
           isExpanded: expandedRow === entity.entityId.toString(),
         };

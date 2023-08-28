@@ -32,10 +32,12 @@ function Search({
   entityTypeCallback,
   defaultAddress,
   defaultEntityId,
+  fullScreen,
 }: {
   addressCallback: (address: string) => void;
   entityIdCallback: (entityId: string) => void;
   entityTypeCallback: (entitType?: ENTITY_TYPES) => void;
+  fullScreen?: boolean;
   defaultAddress?: string;
   defaultEntityId?: string;
 }) {
@@ -220,7 +222,7 @@ function Search({
     <>
       <div
         className="flex-column space-between fade-in"
-        style={{width: '100%', position: 'relative', height: '350px' }}
+        style={{width: '100%', position: 'relative', height: fullScreen ? window.innerHeight * .75 : '350px', }}
       >
         <div className="flex-column gap" style={{ height: '100%' }}>
           {!searchResults ? (
@@ -289,9 +291,9 @@ function Search({
             </div>
           )}
           <div
-            className="white textLarge flex-column flex-center gap scroll-container"
+            className="white textLarge flex-column center gap scroll-container"
             style={{
-              height: '275px',
+              height: fullScreen ? window.innerWidth * .5 : '275px',
               margin: '10px 0px',
               width: '100%',
               boxSizing: 'border-box',
@@ -340,9 +342,9 @@ function Search({
                     }}
                     scrollBarContainerStyle={{
                       right: '0px',
-                      top: '120px',
+                      top: fullScreen ? "130px" : '120px',
                     }}
-                    scrollBarContainerHeight={220}
+                    scrollBarContainerHeight={fullScreen ? window.innerHeight * .6 : 220}
                   >
                     {searchResults.map((result, index) => (
                       <button
@@ -385,7 +387,7 @@ function Search({
               <span
                 className="faded flex-column center"
               >
-                <CircleProgressBar size={80} color="white" />
+                <CircleProgressBar size={80} color="var(--primary)" />
               </span>
             )}
           </div>

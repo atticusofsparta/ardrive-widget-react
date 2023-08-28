@@ -14,15 +14,19 @@ function Menu({
   setShowMenu,
   view,
   setView,
+  fullScreen
 }: {
   setShowMenu: Dispatch<SetStateAction<boolean>>;
   view: string;
   setView: Dispatch<SetStateAction<'search' | 'files' | 'drive'>>;
   hideWidget: boolean;
   setHideWidget: Dispatch<SetStateAction<boolean>>;
+  fullScreen: boolean;
 }) {
   return (
-    <div className="menu flex-column gap1">
+    <div className="menu flex-column gap1" style={{
+      height: fullScreen ? window.innerHeight * .75 : 'auto',
+    }}>
       <button
         className="menuItem"
         onClick={() => {

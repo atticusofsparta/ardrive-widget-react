@@ -1,4 +1,5 @@
 import { ArweaveAddress, EntityID } from '@atticusofsparta/arfs-lite-client';
+import { EnterFullScreenIcon, ExitFullScreenIcon } from '@radix-ui/react-icons';
 import Arweave from 'arweave';
 import { useEffect, useState } from 'react';
 
@@ -18,8 +19,7 @@ function Widget({
   defaultView = 'search',
   preferredHideMode = 'icon',
   defaultEntityId,
-}:
-{
+}: {
   address?: string | (() => string); // default account to load for drive selector
   defaultEntityId?: string; // default entity to load for drive selector
   customArweave?: Arweave;
@@ -36,6 +36,7 @@ function Widget({
   // const [hideMode, setHideMode] = useState<'icon' | 'dropdown' | 'invisible'>(
   //   preferredHideMode,
   // );
+  const [fullScreen, setFullScreen] = useState<boolean>(false);
   const [, setCurrentTheme] = useState<Theme>(DARK_THEME);
   const [, setDataMode] = useState<'select' | 'download'>(mode); // what happens when a file is selected
   const [, setArweave] = useState<Arweave | undefined>(customArweave);
@@ -99,7 +100,7 @@ function Widget({
         // TODO: setup event listeners to get loading feedback from the arfs client91
         // const cachedEntities = await getCachedItemsByDriveId(id.toString())
         // console.log(cachedEntities)
-        
+
         const owner = await arweaveDataProvider._ArFSClient.getOwnerForDriveId(
           id,
         );
@@ -126,7 +127,9 @@ function Widget({
             owner: new ArweaveAddress(entityTypeResult.owner),
           });
 
-        const newDrive = await arweaveDataProvider.buildDriveForFolder(folderEntity);
+        const newDrive = await arweaveDataProvider.buildDriveForFolder(
+          folderEntity,
+        );
         setDrive(newDrive);
       }
       if (entityType === ENTITY_TYPES.FILE && id) {
@@ -139,12 +142,14 @@ function Widget({
           owner: new ArweaveAddress(entityTypeResult.owner),
         });
 
-        const newDrive = await arweaveDataProvider.buildDriveForFile(fileEntity);
+        const newDrive = await arweaveDataProvider.buildDriveForFile(
+          fileEntity,
+        );
         setDrive(newDrive);
       }
     } catch (error) {
       console.error(error);
-      setView("search")
+      setView('search');
     } finally {
       setLoading(false);
     }
@@ -158,10 +163,33 @@ function Widget({
     }
   }
 
+  function handleStartFolder (id: EntityID, type: ENTITY_TYPES, arfsDrive: ArFSDrive | undefined) {
+    switch (type){
+      case ENTITY_TYPES.FOLDER:
+        return id;
+      case ENTITY_TYPES.FILE:{
+        const file = arfsDrive?._fileEntities?.find(file => file.entityId.toString() === id.toString());
+        return arfsDrive?._folderEntities?.find(folder => folder.entityId.toString() === file.parentFolderId.toString())?.entityId;
+      }
+      default:
+        return undefined
+    }
+  }
+
   return (
     <>
       {!hideWidget ? (
-        <div className={`widget`}>
+        <div className={`widget`} style={fullScreen ? {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          borderRadius: 0,
+
+        } : {
+          position:"relative"
+        }}>
           <Navbar
             hideWidget={hideWidget}
             setHideWidget={setHideWidget}
@@ -178,13 +206,13 @@ function Widget({
                   setShowMenu={setShowMenu}
                   setView={setView}
                   view={view}
+                  fullScreen={fullScreen}
                 />
-              ) :
-              view === 'search' ? (
+              ) : view === 'search' ? (
                 <Search
                   addressCallback={(address) => setArweaveAddress(address)}
                   entityIdCallback={(entityId) => {
-                    setArfsEntityId(new EntityID(entityId.toString()))
+                    setArfsEntityId(new EntityID(entityId.toString()));
                   }}
                   entityTypeCallback={(type?: ENTITY_TYPES) =>
                     setEntityType(type)
@@ -193,32 +221,77 @@ function Widget({
                     address ? getDefaultAddress(address) : undefined
                   }
                   defaultEntityId={defaultEntityId}
+                  fullScreen={fullScreen}
                 />
               ) : view === 'files' ? (
-                <Files drive={drive} loadingDrive={loading} loadPercentage={loadPercentage} startFolder={entityType === 'folder' ? arfsEntityId : undefined} />
+                <Files
+                  drive={drive}
+                  loadingDrive={loading}
+                  loadPercentage={loadPercentage}
+                  startFolder={ handleStartFolder(arfsEntityId, entityType, drive) }
+                  fullScreen={fullScreen}
+                />
               ) : (
                 <></>
               )
             ) : (
-              <div
-              className="flex-column center"
-              style={{ height: '100%', marginTop: '-75%', marginLeft:"70px", marginRight:"auto", position: 'absolute' }}
-            >
-              <span className="textLarge white" style={{ display:'flex', justifyContent:"center", position:"absolute", top:"110px" }}>
-                Loading Drive...
-              </span>
-              <CircleProgressBar size={250} color="var(--primary)" />
-            </div>
+              <></>
             )}
+            <button
+              className={'full-screen-button'}
+              onClick={() => setFullScreen(!fullScreen)}
+            >
+              {fullScreen ? (
+                <ExitFullScreenIcon
+                  width={24}
+                  height={24}
+                  color={'var(--text-dark-theme)'}
+                />
+              ) : (
+                <EnterFullScreenIcon
+                  width={24}
+                  height={24}
+                  color={'var(--text-dark-theme)'}
+                />
+              )}
+            </button>
           </div>
+          {loading ?
+            <div
+            className="flex-column center"
+            style={{
+              position: 'absolute',
+              zIndex: 100,
+              margin: 'auto',
+              top: "25%",
+              bottom: "25%",
+              left: "25%",
+              right:"25%"
+
+            }}
+          >
+            <span
+              className="textLarge white"
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                position: 'absolute',
+                margin: 'auto',
+              }}
+            >
+              Loading Drive...
+            </span>
+            <CircleProgressBar size={250} color="var(--primary)" />
+          </div>
+            : <></>}
         </div>
       ) : (
-        <WidgetHidden 
-        mode={preferredHideMode}
-        hideWidget={hideWidget}
-        setHideWidget={setHideWidget}
-        showMenu={showMenu}
-        setShowMenu={setShowMenu}
+        <WidgetHidden
+          mode={preferredHideMode}
+          hideWidget={hideWidget}
+          setHideWidget={setHideWidget}
+          showMenu={showMenu}
+          setShowMenu={setShowMenu}
         />
       )}
     </>

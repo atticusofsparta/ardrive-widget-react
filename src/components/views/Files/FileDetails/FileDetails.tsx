@@ -1,9 +1,15 @@
 import ReactPlayer from 'react-player';
-import { CopyIcon } from '../../../icons';
-import DocViewer, { DocViewerRenderers } from '@cyntler/react-doc-viewer';
+import { CopyIcon, FileDownloadIcon } from '../../../icons';
+import DocViewer, { DocRenderer, DocViewerRenderers } from '@cyntler/react-doc-viewer';
 import Arweave from 'arweave';
 import {useState, useEffect} from 'react'
 import CircleProgressBar from '../../../progress/CircleProgressBar/CircleProgressBar';
+import ReactJson from 'react-json-view';
+import { decodeJsonDataUri, decodeStringDataUri, formatByteCount } from '../../../../utils/searchUtils';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { ExternalLinkIcon } from '@radix-ui/react-icons';
+import CopyTextButton from '../../../inputs/buttons/CopyTextButton/CopyTextButton';
 
 function FileDetails({ row }: { row: any }) {
 
@@ -18,10 +24,160 @@ function FileDetails({ row }: { row: any }) {
       setMeta(JSON.parse(data))
       const highMimeType = JSON.parse(data)?.dataContentType.split('/')[0]
       setMime(highMimeType)
-      console.log(data)
-      console.log(JSON.parse(data)?.dataTxId)
     })
   },[row])
+
+  const customHTMLRenderer: DocRenderer = ({
+    mainState: { currentDocument },
+  }) => {
+    if (!currentDocument) return null;
+  
+    return (
+      <div id="widget-html-renderer" style={{
+        display:"flex",
+        overflow:"hidden",
+        width:"100%",
+        height: window.innerHeight - window.innerHeight * .25,
+      }}>
+        <iframe src={currentDocument.uri} style={{overflow:"scroll", display:"flex", height:"100%"}} width={"100%"}></iframe>
+      </div>
+    );
+  };
+
+  customHTMLRenderer.fileTypes = ["html", "text/html"];
+  customHTMLRenderer.weight = 1;
+
+  const customJSONRenderer: DocRenderer = ({
+    mainState: { currentDocument },
+  }) => {
+    if (!currentDocument) return null;
+
+    
+    let data:any = {}
+    if (currentDocument.fileData && typeof currentDocument.fileData === "string") {
+    data = decodeJsonDataUri(currentDocument.fileData) ?? {}
+    }
+
+  
+    return (
+      <div id="widget-json-renderer" style={{
+        display:"flex",
+        justifyContent:"center",
+        alignItems:"center",
+        overflow:"hidden",
+        width:"100%",
+        height: "fit-content",
+      }}>
+        <ReactJson
+        src={data}
+        theme={'ashes'}
+        name={currentDocument.fileName}
+        groupArraysAfterLength={100}
+        quotesOnKeys={false}
+        style={{
+          display: "flex",
+          width:"100%",
+          border:"solid white 2px",
+          background:"var(--background-dark-theme)",
+          padding:"10px",
+        }}
+      />
+      </div>
+    );
+  };
+
+  customJSONRenderer.fileTypes = ["json", "application/json"];
+  customJSONRenderer.weight = 1;
+
+  
+  const customCodeRenderer: DocRenderer = ({ mainState: { currentDocument } }) => {
+    const [formatted, setFormatted] = useState<string | null>(null);
+    const [language, setLanguage] = useState<string>('plain');
+    const [show, setShow] = useState<boolean>(true);
+
+
+    useEffect(() => {
+      if (currentDocument && currentDocument.fileData && typeof currentDocument.fileData === 'string') {
+        const data = decodeStringDataUri(currentDocument.fileData) ?? '';
+       setLanguage(currentDocument.fileType?.split('/')[1] ?? 'plain');
+        setFormatted(data)
+        if (meta.size > 1_000_000) {
+          setShow(false)
+        }
+      }
+    },[])
+
+    if (!formatted) return null;
+        
+    return (
+      <div
+        id="widget-json-renderer"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          overflow: 'hidden',
+          width: '100%',
+          height: 'fit-content',
+        }}
+      >{ show ?
+        <SyntaxHighlighter
+          language={language}
+          style={dark}
+          showLineNumbers={true}
+        >
+          {formatted}
+        </SyntaxHighlighter> : 
+        <div className='flex-column center' style={{gap:"20px"}}>
+          {/*
+          TODO: add code formatter to format files (eg prettier)
+          TODO: add react render virtualization. Attempted to with this package, but its broken: https://github.com/conorhastings/react-syntax-highlighter-virtualized-renderer/blob/master/src/index.jsx  */}
+          <span className="textMedium white">The selected {language} file is large ({formatByteCount(meta.size)}) and may cause issues rendering. Do you wish to continue?</span>
+          <button className='button-primary white' style={{height:"30px", fontSize:"16px"}} onClick={()=> setShow(true)}>Render File</button>
+          </div>}
+      </div>
+    );
+  };
+  customCodeRenderer.fileTypes = [
+    "text", 
+    "javascript",
+    "text/javascript",
+    "application/javascript", 
+    "application/typescript", 
+    "application/x-sh", // Shell script
+    "application/x-python-code", // Python
+    "application/x-ruby", // Ruby
+    "application/x-perl", // Perl
+    "application/x-php", // PHP
+    "application/sql", // SQL
+    "application/json", // JSON
+    "application/ld+json", // JSON-LD
+    "application/x-yaml", // YAML
+    "application/x-tex", // TeX
+    "application/x-latex", // LaTeX
+    "application/vnd.api+json", // JSON API
+    "application/graphql", // GraphQL
+    "text/css", 
+    "text/plain", 
+    "text/xml", 
+    "text/x-", 
+    "text/yaml",
+    "application/postscript",
+  ];
+  
+  customCodeRenderer.weight = 1;
+
+  async function downloadFile(url:string, name:string) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
 
   return (
     <div
@@ -40,15 +196,20 @@ function FileDetails({ row }: { row: any }) {
 
       /></> : <>
     <DocViewer 
-      documents={[{uri: `https://arweave.net/${meta.dataTxId}`}]}
-      pluginRenderers={DocViewerRenderers}
+    prefetchMethod='GET'
+      documents={[
+        {
+          uri: `https://arweave.net/${meta.dataTxId}`
+        }]
+      }
+      pluginRenderers={[...DocViewerRenderers, customHTMLRenderer, customJSONRenderer, customCodeRenderer]}
       theme={{
         primary: "var(--primary)",
         secondary: "--text-dark-theme",
-        tertiary: "green",
+        tertiary: "var(--input-placeholder)",
         textPrimary: "#ffffff",
         textSecondary: "#5296d8",
-        textTertiary: "green",
+        textTertiary: "var(--input-placeholder)",
         disableThemeScrollbar: false,
       }}
       language='en'
@@ -59,11 +220,15 @@ function FileDetails({ row }: { row: any }) {
         width: "100%",
       }}
       config={{
+      
         header:{
           disableHeader: true,
         },
         loadingRenderer: {
-          overrideComponent:({document, fileName})=> <div className={'flex-row justify-cente align-center'}><CircleProgressBar size={80} color='var(--primary)' /></div>,
+          overrideComponent:({document, fileName})=> <div className={'flex-row justify-center align-center'}><CircleProgressBar size={80} color='var(--primary)' /></div>,
+        },
+        noRenderer: {
+          overrideComponent:({document, fileName})=> <div className={'flex flex-column center white'} style={{width:"100%", gap:"20px", padding:"20px"}}>File preview unavailable for that mime type.</div>,
         },
 
       }}
@@ -79,26 +244,51 @@ function FileDetails({ row }: { row: any }) {
             {row.entityId.toString()}
           </span>
         </span>
-        <button className="button flex-column center">
-          <CopyIcon width={15} height={15} fill={'var(--foreground-muted)'} />
-        </button>
+        <CopyTextButton 
+        copyText={row.entityId.toString()}
+        position='static'
+        copyButtonStyle={{
+          cursor: 'pointer',
+          fill:"var(--foreground-muted)"
+        }}
+        />
       </div>
 
       <div className="flex-row space-between" style={{ width: '100%' }}>
-        <span className="flex-column textMedium white">
-          Data ID:
-          <br />
-          <span
-            className="textSmall"
-            style={{ color: 'var(--text-subtle)', fontSize: '10px' }}
-          >
-            {row.txId.toString()}
-          </span>
-        </span>
-        <button className="button flex-column center">
-          <CopyIcon width={15} height={15} fill={'var(--foreground-muted)'} />
-        </button>
-      </div>
+  <span className="flex-column textMedium white">
+    Data ID:
+    <br />
+    <span
+      className="textSmall"
+      style={{ color: 'var(--text-subtle)', fontSize: '10px' }}
+    >
+      {row.txId.toString()}
+    </span>
+  </span>
+  <div className="flex-row center" style={{ gap: '10px' }}>
+    {/* Copy Button */}
+    <CopyTextButton 
+        copyText={meta.dataTxId?.toString()}
+        position='static'
+        copyButtonStyle={{
+          cursor: 'pointer',
+          fill:"var(--foreground-muted)",
+        }}
+        />
+    {/* Download Button */}
+    <button
+      className="button flex-column center" 
+      onClick={()=> downloadFile(`https://arweave.net/${meta.dataTxId}`, row.name)}
+    >
+      <FileDownloadIcon width={15} height={15} fill={'var(--foreground-muted)'} />
+    </button>
+
+    {/* External Link Button */}
+    <a className="button flex-column center" href={`https://arweave.net/${meta.dataTxId}`} rel='noreferrer' target='_blank'>
+      <ExternalLinkIcon width={15} height={15} color='var(--foreground-muted)' />
+    </a>
+  </div>
+    </div>
     </div>
   );
 }

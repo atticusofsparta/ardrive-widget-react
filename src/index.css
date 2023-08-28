@@ -35,6 +35,24 @@ button {
   font-family: 'Wavehaus';
 }
 
+.full-screen-button {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+  bottom:-40px;
+  right: -40px;
+  border: none;
+  background:none;
+}
+.full-screen-button:hover {
+  box-shadow: var(--shadow);
+  transition: all 0.2s ease-in-out;
+}
+
 .widget {
   box-sizing: border-box;
   display: flex;

@@ -17,7 +17,9 @@ function Files({
   loadingDrive,
   // loadPercentage,
   startFolder,
+  fullScreen
 }: {
+  fullScreen: boolean;
   drive?: ArFSDrive;
   loadingDrive?: boolean;
   loadPercentage?: number;
@@ -37,20 +39,19 @@ function Files({
   useEffect(() => {
     if (drive && !currentFolder) {
       // TODO: fix loading for file only drives here. Need to add parent folder logic as startFolder.
-      setCurrentFolder(drive._driveEntity.rootFolderId);
+      setCurrentFolder(new EntityID(drive._driveEntity.rootFolderId.entityId));
+      console.log(drive._driveEntity.rootFolderId);
     }
+
     setFileData(updateRows(rows));
     setFileColumns(columns);
     setDrivePath(currentFolder ? updateDrivePath(currentFolder) : []);
     updatePages(1);
-
   }, [rows, currentFolder, startFolder]);
-  
 
   function updateRows(rows: any[]) {
     const filteredRows = rows.filter((row) => {
       if (row.entityType === 'folder' && row.folderId) {
-        
       }
       const parentFolderId = row.parentFolderId?.entityId?.toString();
       if (parentFolderId === 'root folder') {
@@ -61,7 +62,6 @@ function Files({
       }
       return parentFolderId === currentFolder?.toString();
     });
-    console.log(filteredRows);
 
     return filteredRows;
   }
@@ -97,28 +97,21 @@ function Files({
   }
 
   function getNameForId(id: EntityID) {
-
-    const entity = drive?._folderEntities.find((folder:ArFSPublicFolder) => {
+    const entity = drive?._folderEntities.find((folder: ArFSPublicFolder) => {
       // TODO: this is a bug with loading folders vs drives. Clean works for drives, dirty for folders. Fix this disgusting code when possible.
-      const cleanResult = folder.entityId.toString() === id?.toString() 
-      console.log(folder, id, drive._driveEntity)
-      console.log(cleanResult, id)
-      if (cleanResult) return cleanResult
+      const cleanResult = folder.entityId.toString() === id?.toString();
+      if (cleanResult) return cleanResult;
       const dirtyResult = folder.entityId.toString() === id?.toString();
-      console.log(dirtyResult, id)
       return dirtyResult;
     });
-    console.log(entity, id)
     return entity?.name;
   }
 
   function updatePages(pageNumber: number) {
-
     setPage(pageNumber);
     const start = (pageNumber - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     setPaginatedFileData(updateRows(rows).slice(start, end));
-
   }
 
   function PathPopup({ paths }: { paths: EntityID[] }) {
@@ -195,7 +188,7 @@ function Files({
             top: '100px',
           }}
         >
-          Loading Drive...
+          Loading Files...
           {/*TODO: setup cache interaction listener to calculate loading percentage
            <br />
           <br />
@@ -211,7 +204,7 @@ function Files({
       className="flex-column"
       style={{
         position: 'relative',
-        height: '350px',
+        height: fullScreen ? window.innerHeight - window.innerHeight * .25 : '350px',
         width: '100%',
         justifyContent: 'flex-end',
       }}
@@ -234,10 +227,7 @@ function Files({
           {currentFolder?.toString() !==
           drive?._driveEntity.rootFolderId.toString()
             ? ' / ' +
-              getNameForId(
-                currentFolder ??
-                  drive?._driveEntity.rootFolderId,
-              )
+              getNameForId(currentFolder ?? drive?._driveEntity.rootFolderId)
             : ''}
         </span>
         <Pagination
@@ -296,7 +286,7 @@ function Files({
           scrollBarContainerStyle={
             paginatedFileData.length > 4 ? { top: '70px' } : { display: 'none' }
           }
-          scrollBarContainerHeight={260}
+          scrollBarContainerHeight={fullScreen ? window.innerHeight * .65 : 260}
         >
           <Table
             columns={fileColumns}
@@ -325,7 +315,6 @@ function Files({
                 style={{
                   width: '100%',
                   height: '100%',
-                  marginTop: '60px',
                   gap: '40px',
                 }}
               >
