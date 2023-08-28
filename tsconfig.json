@@ -16,6 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["vite.config.ts" ],
+  "include": ["vite.config.ts", "src" ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

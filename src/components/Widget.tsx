@@ -27,28 +27,30 @@ function Widget({
   defaultView?: 'search' | 'files' | 'drive'; // default view to show when widget is opened
   preferredHideMode?: 'icon' | 'dropdown'; // widget hide behavior
 }) {
-  const arweaveDataProvider = useArweaveCompositeDataProvider(customArweave);
+  const [arweave, setArweave] = useState<Arweave | undefined>(customArweave);
+  const arweaveDataProvider = useArweaveCompositeDataProvider(arweave);
   const [view, setView] = useState<'search' | 'files' | 'drive'>(defaultView);
   const [showMenu, setShowMenu] = useState<boolean>(true);
   const [hideWidget, setHideWidget] = useState<boolean>(true);
-  const [hideMode, setHideMode] = useState<'icon' | 'dropdown'>(
+  const [hideMode] = useState<'icon' | 'dropdown'>(
     preferredHideMode,
   );
   const [fullScreen, setFullScreen] = useState<boolean>(false);
-  const [, setCurrentTheme] = useState<Theme>(DARK_THEME);
-  const [, setArweave] = useState<Arweave | undefined>(customArweave);
+  const [currentTheme, setCurrentTheme] = useState<Theme>(DARK_THEME);
   //
-  const [arweaveAddress, setArweaveAddress] = useState<string | undefined>(address);
+  const [arweaveAddress, setArweaveAddress] = useState<string | undefined>(address); // more important for when implementing private drives
   const [arfsEntityId, setArfsEntityId] = useState<EntityID | undefined>(
     defaultEntityId ? new EntityID(defaultEntityId) : undefined,
   );
   const [entityType, setEntityType] = useState<ENTITY_TYPES | undefined>(
     undefined,
   );
+  const [drive, setDrive] = useState<ArFSDrive>();
+
   const [loading, setLoading] = useState<boolean>(false);
   const [loadPercentage] = useState<number>(0);
 
-  const [drive, setDrive] = useState<ArFSDrive>();
+
 
   useEffect(() => {
     switch (theme) {
@@ -155,8 +157,8 @@ function Widget({
   }
 
   function handleStartFolder(
-    id: EntityID,
-    type: ENTITY_TYPES,
+    id: EntityID | undefined,
+    type: ENTITY_TYPES | undefined,
     arfsDrive: ArFSDrive | undefined,
   ) {
     switch (type) {
@@ -164,11 +166,11 @@ function Widget({
         return id;
       case ENTITY_TYPES.FILE: {
         const file = arfsDrive?._fileEntities?.find(
-          (file) => file.entityId.toString() === id.toString(),
+          (file) => file.entityId.toString() === id?.toString(),
         );
         return arfsDrive?._folderEntities?.find(
           (folder) =>
-            folder.entityId.toString() === file.parentFolderId.toString(),
+            folder.entityId.toString() === file?.parentFolderId.toString(),
         )?.entityId;
       }
       default:
