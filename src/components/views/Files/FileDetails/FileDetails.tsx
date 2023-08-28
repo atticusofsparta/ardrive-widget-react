@@ -1,5 +1,5 @@
 import ReactPlayer from 'react-player';
-import { CopyIcon, FileDownloadIcon } from '../../../icons';
+import { FileDownloadIcon } from '../../../icons';
 import DocViewer, { DocRenderer, DocViewerRenderers } from '@cyntler/react-doc-viewer';
 import Arweave from 'arweave';
 import {useState, useEffect} from 'react'
@@ -7,7 +7,7 @@ import CircleProgressBar from '../../../progress/CircleProgressBar/CircleProgres
 import ReactJson from 'react-json-view';
 import { decodeJsonDataUri, decodeStringDataUri, formatByteCount } from '../../../../utils/searchUtils';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ExternalLinkIcon } from '@radix-ui/react-icons';
 import CopyTextButton from '../../../inputs/buttons/CopyTextButton/CopyTextButton';
 
@@ -92,14 +92,16 @@ function FileDetails({ row }: { row: any }) {
   
   const customCodeRenderer: DocRenderer = ({ mainState: { currentDocument } }) => {
     const [formatted, setFormatted] = useState<string | null>(null);
-    const [language, setLanguage] = useState<string>('plain');
+    const [language, setLanguage] = useState<string>('text');
     const [show, setShow] = useState<boolean>(true);
 
 
     useEffect(() => {
       if (currentDocument && currentDocument.fileData && typeof currentDocument.fileData === 'string') {
         const data = decodeStringDataUri(currentDocument.fileData) ?? '';
-       setLanguage(currentDocument.fileType?.split('/')[1] ?? 'plain');
+        const fileExt = meta.name?.split('.')?.pop()?.toLowerCase() ?? '';
+        // TODO: map file extensions to languages supported by react-syntax-highlighter, improve mime type detection
+       setLanguage(fileExt === "tsx" || fileExt === 'jsx' || fileExt === 'ts' ? fileExt : currentDocument.fileType?.split('/')[1] ?? 'text');
         setFormatted(data)
         if (meta.size > 1_000_000) {
           setShow(false)
@@ -123,7 +125,7 @@ function FileDetails({ row }: { row: any }) {
       >{ show ?
         <SyntaxHighlighter
           language={language}
-          style={dark}
+          style={vscDarkPlus}
           showLineNumbers={true}
         >
           {formatted}
@@ -142,8 +144,13 @@ function FileDetails({ row }: { row: any }) {
     "text", 
     "javascript",
     "text/javascript",
+    "tsx",
+    "jsx",
+    "application/octet-stream",
     "application/javascript", 
+    "application/x-javascript", 
     "application/typescript", 
+    "application/x-typescript", 
     "application/x-sh", // Shell script
     "application/x-python-code", // Python
     "application/x-ruby", // Ruby
@@ -163,6 +170,41 @@ function FileDetails({ row }: { row: any }) {
     "text/x-", 
     "text/yaml",
     "application/postscript",
+    "application/vnd.ms-fontobject", // EOT font files
+    "application/font-woff", // WOFF font files
+    "application/font-woff2", // WOFF2 font files
+    "application/x-font-ttf", // TTF font files
+    "application/x-font-otf", // OTF font files
+    "application/x-font-bdf", // BDF font files
+    "application/x-font-pcf", // PCF font files
+    "application/x-font-speedo", // Speedo font files
+    "application/x-font-type1", // Type 1 font files
+    "application/vnd.ms-opentype", // OpenType font files
+    "application/vnd.oasis.opendocument.text", // ODT files
+    "application/vnd.oasis.opendocument.spreadsheet", // ODS files
+    "application/vnd.oasis.opendocument.presentation", // ODP files
+    "application/vnd.oasis.opendocument.graphics", // ODG files
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX files
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // XLSX files
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX files
+    "application/vnd.ms-excel", // XLS files
+    "application/vnd.ms-powerpoint", // PPT files
+    "application/msword", // DOC files
+    "application/rtf", // RTF files
+    "application/csv", // CSV files
+    "application/tsv", // TSV files
+    "application/vnd.mozilla.xul+xml", // XUL files
+    "application/rss+xml", // RSS feed files
+    "application/atom+xml", // Atom feed files
+    "application/pkix-cert", // X.509 certificates
+    "application/pkix-crl", // X.509 CRLs
+    "application/pkcs12", // PKCS #12 files
+    "application/pkcs7-mime", // PKCS #7 files
+    "application/x-x509-ca-cert", // CA certificates
+    "application/x-x509-user-cert", // User certificates
+    "application/x-pkcs7-certificates", // PKCS #7 certificate chain
+    "application/x-pkcs7-certreqresp", // PKCS #7 certificate request response
+    "application/x-pkcs7-signature", // PKCS #7 detached signature
   ];
   
   customCodeRenderer.weight = 1;

@@ -13,7 +13,6 @@ import WidgetHidden from './views/WidgetHidden/WidgetHidden';
 
 function Widget({
   theme = 'dark',
-  mode = 'select',
   customArweave,
   address,
   defaultView = 'search',
@@ -24,24 +23,22 @@ function Widget({
   defaultEntityId?: string; // default entity to load for drive selector
   customArweave?: Arweave;
   transactionIdCallback?: (txid: string) => string; // returns data txid of the arfs file
-  mode?: 'select' | 'download'; // determined by implementation whether or to return the transaction id or download the file
   theme?: 'light' | 'dark' | Theme; // light, dark, or custom theme
   defaultView?: 'search' | 'files' | 'drive'; // default view to show when widget is opened
-  preferredHideMode?: 'icon' | 'dropdown' | 'invisible'; // widget hide behavior
+  preferredHideMode?: 'icon' | 'dropdown'; // widget hide behavior
 }) {
   const arweaveDataProvider = useArweaveCompositeDataProvider(customArweave);
   const [view, setView] = useState<'search' | 'files' | 'drive'>(defaultView);
   const [showMenu, setShowMenu] = useState<boolean>(true);
   const [hideWidget, setHideWidget] = useState<boolean>(true);
-  // const [hideMode, setHideMode] = useState<'icon' | 'dropdown' | 'invisible'>(
-  //   preferredHideMode,
-  // );
+  const [hideMode, setHideMode] = useState<'icon' | 'dropdown'>(
+    preferredHideMode,
+  );
   const [fullScreen, setFullScreen] = useState<boolean>(false);
   const [, setCurrentTheme] = useState<Theme>(DARK_THEME);
-  const [, setDataMode] = useState<'select' | 'download'>(mode); // what happens when a file is selected
   const [, setArweave] = useState<Arweave | undefined>(customArweave);
   //
-  const [, setArweaveAddress] = useState<string | undefined>(address);
+  const [arweaveAddress, setArweaveAddress] = useState<string | undefined>(address);
   const [arfsEntityId, setArfsEntityId] = useState<EntityID | undefined>(
     defaultEntityId ? new EntityID(defaultEntityId) : undefined,
   );
@@ -65,9 +62,6 @@ function Widget({
         setCurrentTheme(theme);
         break;
     }
-    if (mode) {
-      setDataMode(mode);
-    }
     if (customArweave) {
       setArweave(customArweave);
     }
@@ -81,7 +75,7 @@ function Widget({
     if (defaultEntityId) {
       setArfsEntityId(new EntityID(defaultEntityId));
     }
-  }, [theme, address, mode, customArweave, defaultEntityId, defaultView]);
+  }, [theme, address, customArweave, defaultEntityId, defaultView]);
 
   useEffect(() => {
     if (arfsEntityId && arfsEntityId.toString().length > 0) {
@@ -101,9 +95,8 @@ function Widget({
         // const cachedEntities = await getCachedItemsByDriveId(id.toString())
         // console.log(cachedEntities)
 
-        const owner = await arweaveDataProvider._ArFSClient.getOwnerForDriveId(
-          id,
-        );
+        const owner =
+          await arweaveDataProvider._ArFSClient.getOwnerForDriveId(id);
         const driveEntity =
           await arweaveDataProvider._ArFSClient.getPublicDrive({
             driveId: id,
@@ -127,9 +120,8 @@ function Widget({
             owner: new ArweaveAddress(entityTypeResult.owner),
           });
 
-        const newDrive = await arweaveDataProvider.buildDriveForFolder(
-          folderEntity,
-        );
+        const newDrive =
+          await arweaveDataProvider.buildDriveForFolder(folderEntity);
         setDrive(newDrive);
       }
       if (entityType === ENTITY_TYPES.FILE && id) {
@@ -142,9 +134,8 @@ function Widget({
           owner: new ArweaveAddress(entityTypeResult.owner),
         });
 
-        const newDrive = await arweaveDataProvider.buildDriveForFile(
-          fileEntity,
-        );
+        const newDrive =
+          await arweaveDataProvider.buildDriveForFile(fileEntity);
         setDrive(newDrive);
       }
     } catch (error) {
@@ -163,33 +154,48 @@ function Widget({
     }
   }
 
-  function handleStartFolder (id: EntityID, type: ENTITY_TYPES, arfsDrive: ArFSDrive | undefined) {
-    switch (type){
+  function handleStartFolder(
+    id: EntityID,
+    type: ENTITY_TYPES,
+    arfsDrive: ArFSDrive | undefined,
+  ) {
+    switch (type) {
       case ENTITY_TYPES.FOLDER:
         return id;
-      case ENTITY_TYPES.FILE:{
-        const file = arfsDrive?._fileEntities?.find(file => file.entityId.toString() === id.toString());
-        return arfsDrive?._folderEntities?.find(folder => folder.entityId.toString() === file.parentFolderId.toString())?.entityId;
+      case ENTITY_TYPES.FILE: {
+        const file = arfsDrive?._fileEntities?.find(
+          (file) => file.entityId.toString() === id.toString(),
+        );
+        return arfsDrive?._folderEntities?.find(
+          (folder) =>
+            folder.entityId.toString() === file.parentFolderId.toString(),
+        )?.entityId;
       }
       default:
-        return undefined
+        return undefined;
     }
   }
 
   return (
     <>
       {!hideWidget ? (
-        <div className={`widget`} style={fullScreen ? {
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          borderRadius: 0,
-
-        } : {
-          position:"relative"
-        }}>
+        <div
+          className={`widget`}
+          style={
+            fullScreen
+              ? {
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: 0,
+                }
+              : {
+                  position: 'relative',
+                }
+          }
+        >
           <Navbar
             hideWidget={hideWidget}
             setHideWidget={setHideWidget}
@@ -228,7 +234,11 @@ function Widget({
                   drive={drive}
                   loadingDrive={loading}
                   loadPercentage={loadPercentage}
-                  startFolder={ handleStartFolder(arfsEntityId, entityType, drive) }
+                  startFolder={handleStartFolder(
+                    arfsEntityId,
+                    entityType,
+                    drive,
+                  )}
                   fullScreen={fullScreen}
                 />
               ) : (
@@ -256,38 +266,39 @@ function Widget({
               )}
             </button>
           </div>
-          {loading ?
+          {loading ? (
             <div
-            className="flex-column center"
-            style={{
-              position: 'absolute',
-              zIndex: 100,
-              margin: 'auto',
-              top: "25%",
-              bottom: "25%",
-              left: "25%",
-              right:"25%"
-
-            }}
-          >
-            <span
-              className="textLarge white"
+              className="flex-column center"
               style={{
-                display: 'flex',
-                justifyContent: 'center',
                 position: 'absolute',
+                zIndex: 100,
                 margin: 'auto',
+                top: '25%',
+                bottom: '25%',
+                left: '25%',
+                right: '25%',
               }}
             >
-              Loading Drive...
-            </span>
-            <CircleProgressBar size={250} color="var(--primary)" />
-          </div>
-            : <></>}
+              <span
+                className="textLarge white"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  position: 'absolute',
+                  margin: 'auto',
+                }}
+              >
+                Loading Drive...
+              </span>
+              <CircleProgressBar size={250} color="var(--primary)" />
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
       ) : (
         <WidgetHidden
-          mode={preferredHideMode}
+          mode={hideMode}
           hideWidget={hideWidget}
           setHideWidget={setHideWidget}
           showMenu={showMenu}
