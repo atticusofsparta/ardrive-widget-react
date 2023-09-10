@@ -1,0 +1,184 @@
+@import '@radix-ui/colors/gray-dark.css';
+@import '@radix-ui/colors/blue-dark.css';
+@import '@radix-ui/colors/green-dark.css';
+@import '@radix-ui/colors/red-dark.css';
+
+:root {
+  --radius: 4px;
+  --shadow: 3px 4px 5px 1px rgb(0, 0, 0);
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+}
+/* Flexbox classes */
+.flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+/* Justify Content classes */
+.justify-start {
+  justify-content: flex-start;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-space-between {
+  justify-content: space-between;
+}
+
+.justify-space-around {
+  justify-content: space-around;
+}
+
+/* Align Items classes */
+.align-start {
+  align-items: flex-start;
+}
+
+.align-end {
+  align-items: flex-end;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.align-baseline {
+  align-items: baseline;
+}
+
+.align-stretch {
+  align-items: stretch;
+}
+
+/* Grid classes */
+.grid {
+  display: grid;
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Add more grid classes as needed */
+
+/* Additional grid properties */
+.grid-gap {
+  gap: 1rem; /* Adjust the gap value as needed */
+}
+
+.grid-rows-auto {
+  grid-auto-rows: auto;
+}
+
+.grid-cols-auto {
+  grid-auto-columns: auto;
+}
+
+.page-container {
+  display: flex;
+  background-image: linear-gradient(
+    to bottom right,
+    var(--green-2),
+    var(--gray-2)
+  );
+  height: 100vh;
+  width: 100%;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.navbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--green-1);
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid var(--green-5);
+  padding: 0px 30px;
+}
+
+.footer {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px 30px;
+  background: var(--green-1);
+  height: 50px;
+}
+
+.footer-links {
+  background: var(--green-1);
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 2em;
+  align-items: center;
+}
+
+.footer-links > a {
+  color: var(--amber-6);
+  font-weight: bold;
+  text-decoration: solid;
+}
+
+h1 {
+  color: var(--grass-7);
+}
+
+.link {
+  color: var(--green-11);
+  font-weight: bold;
+  text-decoration: solid;
+  cursor: pointer;
+}
+.link:hover {
+  color: var(--blue-8);
+}
+
+.card {
+  background-color: var(--green-5);
+  border-radius: var(--radius);
+  gap: 15px;
+  padding: 10px;
+}
+
+button {
+  cursor: pointer;
+}

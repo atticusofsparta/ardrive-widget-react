@@ -16,7 +16,11 @@ function FileDetails({ row }: { row: any }) {
   const [meta, setMeta] = useState<any>({})
   const [mime, setMime] = useState<any>("")
 
-  const arweave = Arweave.init({})
+  const arweave = Arweave.init({
+    host:"arweave.net",
+    port:443,
+    protocol:"https"
+  })
 
   useEffect(()=>{
     arweave.transactions.getData(row.txId, {decode: true, string: true}).then((val:string | Uint8Array)=>{
