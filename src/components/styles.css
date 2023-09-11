@@ -181,7 +181,7 @@ button {
   color: var(--text-subtle);
 }
 .white {
-  color: var(--foreground-muted);
+  color: var(--foreground-muted) !important;
 }
 .radius {
   border-radius: 6px;

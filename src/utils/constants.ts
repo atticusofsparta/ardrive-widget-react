@@ -1,4 +1,5 @@
-import { DriveStructure, GqlResultTagArray, TagsObject } from '../types';
+import EventEmitter from 'eventemitter3';
+import { GqlResultTagArray, TagsObject } from '../types';
 
 export const ARFS_ID_REGEX = new RegExp(
   '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
@@ -48,4 +49,15 @@ export function tagsToObject({
   const tagObject: { [x: string]: string } = {};
   tags.map((tag) => (tagObject[tag.name] = tag.value));
   return tagObject;
+}
+
+
+export const eventEmitter = new EventEmitter();
+
+export enum WIDGET_EVENTS {
+  LOADED = 'ARDRIVE_WIDGET_LOADED',
+  HIDE = 'HIDE_ARDRIVE_WIDGET',
+  TX_COPY = 'TX_COPY',
+  ARFS_ID_COPY = 'ARFS_ID_COPY',
+  ENTITY_LOADED = 'ENTITY_LOADED' // type and id
 }

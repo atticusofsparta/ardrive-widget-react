@@ -24,4 +24,9 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['vm2'],
   },
+  server:{
+    fs: {
+      allow: ['..']
+    }
+  }
 });

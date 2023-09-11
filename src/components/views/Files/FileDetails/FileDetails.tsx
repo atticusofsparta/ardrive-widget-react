@@ -10,8 +10,9 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ExternalLinkIcon } from '@radix-ui/react-icons';
 import CopyTextButton from '../../../inputs/buttons/CopyTextButton/CopyTextButton';
+import { eventEmitter } from '../../../../utils/constants';
 
-function FileDetails({ row }: { row: any }) {
+function FileDetails({ row, hideOnCopy }: { row: any, hideOnCopy?: boolean }) {
 
   const [meta, setMeta] = useState<any>({})
   const [mime, setMime] = useState<any>("")
@@ -314,6 +315,12 @@ function FileDetails({ row }: { row: any }) {
   <div className="flex-row center" style={{ gap: '10px' }}>
     {/* Copy Button */}
     <CopyTextButton 
+        onCopy={()=> {
+          eventEmitter.emit('TX_COPY', row.txId.toString())
+          if (hideOnCopy) {
+            eventEmitter.emit('HIDE_ARDRIVE_WIDGET')
+          }
+        }}
         copyText={meta.dataTxId?.toString()}
         position='static'
         copyButtonStyle={{

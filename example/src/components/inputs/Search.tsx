@@ -7,10 +7,12 @@ function Search({
   submitCallback,
   onChangeCallback,
   style,
+  icon
 }: {
   style?: CSSProperties;
   submitCallback?: (query: string) => void;
   onChangeCallback?: (query: string) => void;
+  icon?: JSX.Element;
 }) {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchParams, setSearchparams] = useSearchParams();
@@ -57,6 +59,7 @@ function Search({
         radius="full"
       />
       <TextField.Slot>
+    { icon ? icon :
         <Button
           variant="ghost"
           radius="full"
@@ -65,6 +68,7 @@ function Search({
         >
           <MagnifyingGlassIcon height="16" width="16" />
         </Button>
+        }
       </TextField.Slot>
     </TextField.Root>
   );

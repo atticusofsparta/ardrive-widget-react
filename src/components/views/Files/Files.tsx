@@ -17,13 +17,15 @@ function Files({
   loadingDrive,
   // loadPercentage,
   startFolder,
-  fullScreen
+  fullScreen,
+  hideOnCopy = false
 }: {
   fullScreen: boolean;
   drive?: ArFSDrive;
   loadingDrive?: boolean;
   loadPercentage?: number;
   startFolder?: EntityID;
+  hideOnCopy?: boolean;
 }) {
   const { rows, columns, expandRow, expandedRowKey } = useFilesTable(drive);
   const [fileData, setFileData] = useState<any[]>([]);
@@ -297,7 +299,7 @@ function Files({
               rowExpandable: () => true,
               expandRowByClick: true,
               expandedRowKeys: [expandedRowKey ?? ''],
-              expandedRowRender: (record) => <FileDetails row={record} />,
+              expandedRowRender: (record) => <FileDetails row={record} hideOnCopy={hideOnCopy} />,
             }}
             onRow={(record) => ({
               onClick: () => {

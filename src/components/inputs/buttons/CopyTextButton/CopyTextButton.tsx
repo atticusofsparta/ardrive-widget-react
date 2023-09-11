@@ -10,6 +10,7 @@ function CopyTextButton({
   wrapperStyle = {},
   position = 'absolute',
   copyButtonStyle,
+  onCopy
 }: {
   copyText: string;
   body?: JSX.Element | string;
@@ -17,6 +18,7 @@ function CopyTextButton({
   wrapperStyle?: any;
   position?: 'static' | 'relative' | 'absolute' | 'sticky' | 'fixed';
   copyButtonStyle?: any;
+  onCopy?: () => void;
 }) {
   const [textCopied, setTextCopied] = useState<boolean>(false);
 
@@ -24,6 +26,9 @@ function CopyTextButton({
     setTextCopied(true);
     if (copyText) {
       await navigator.clipboard.writeText(copyText);
+    }
+    if (onCopy) {
+      onCopy();
     }
     setTimeout(() => {
       setTextCopied(false);

@@ -2,14 +2,18 @@ import { ArweaveAddress, EntityID } from '@atticusofsparta/arfs-lite-client';
 import { EnterFullScreenIcon, ExitFullScreenIcon } from '@radix-ui/react-icons';
 import Arweave from 'arweave';
 import { useEffect, useState } from 'react';
+import { EventEmitter } from 'eventemitter3';
 
 import useArweaveCompositeDataProvider from '../hooks/useArweaveCompositeDataProvider/useArweaveCompositeDataProvider';
 import ArFSDrive from '../services/ArFSDrive';
 import { ENTITY_TYPES, Theme } from '../types';
-import { DARK_THEME, LIGHT_THEME } from '../utils/constants';
+import { DARK_THEME, LIGHT_THEME, eventEmitter } from '../utils/constants';
 import CircleProgressBar from './progress/CircleProgressBar/CircleProgressBar';
 import { Files, Menu, Navbar, Search } from './views';
 import WidgetHidden from './views/WidgetHidden/WidgetHidden';
+import './styles.css'
+import useArdriveEvents from '../hooks/useArdriveEvents/useArdriveEvents';
+
 
 function Widget({
   theme = 'dark',
@@ -18,15 +22,55 @@ function Widget({
   defaultView = 'search',
   preferredHideMode = 'icon',
   defaultEntityId,
+  hideOnCopy = false,
+  eventEmitterCallback,
+  widgetHiddenCallback,
+  defaultAddressCallback,
+  defaultEntityIdCallback,
+  lastTxCopyCallback,
+  lastArfsIdCopyCallback,
+  loadedArfsIdCallback,
+  loadedEntityTypeCallback,  
 }: {
+  eventEmitterCallback?: (emitter:any) => void;
+  widgetHiddenCallback?: (hidden?: boolean) => void;
+  defaultAddressCallback?: (address?: string) => void;
+  defaultEntityIdCallback?: (entityId?: string, type?:string) => void;
+  lastTxCopyCallback?: (tx?: string) => void;
+  lastArfsIdCopyCallback?: (arfsId?: string) => void;
+  loadedArfsIdCallback?: (arfsId?: string, type?: string) => void;
+  loadedEntityTypeCallback?: (type?: string) => void;
   address?: string | (() => string); // default account to load for drive selector
   defaultEntityId?: string; // default entity to load for drive selector
   customArweave?: Arweave;
-  transactionIdCallback?: (txid: string) => string; // returns data txid of the arfs file
   theme?: 'light' | 'dark' | Theme; // light, dark, or custom theme
   defaultView?: 'search' | 'files' | 'drive'; // default view to show when widget is opened
   preferredHideMode?: 'icon' | 'dropdown'; // widget hide behavior
+  hideOnCopy?: boolean; // hide widget when user copies data
 }) {
+
+
+  const thisWindow = window as any;
+
+  if (!thisWindow.ardriveEvents) {
+    thisWindow.ardriveEvents = new EventEmitter();
+  }
+
+  if (window.ardriveEvents) {
+    eventEmitter.emit('ARDRIVE_WIDGET_LOADED');
+  }
+
+
+  const {
+    ardriveEmitter,
+    widgetHidden,
+    defaultAddress,
+    defaultArfsId,
+    lastTxCopy,
+    lastArfsIdCopy,
+    loadedArfsId,
+    loadedEntityType
+  } = useArdriveEvents()
   const [arweave, setArweave] = useState<Arweave | undefined>(customArweave);
   const arweaveDataProvider = useArweaveCompositeDataProvider(arweave);
   const [view, setView] = useState<'search' | 'files' | 'drive'>(defaultView);
@@ -50,7 +94,18 @@ function Widget({
   const [loading, setLoading] = useState<boolean>(false);
   const [loadPercentage] = useState<number>(0);
 
-
+  useEffect(()=> {
+    handleCallbacks()
+  },[
+    ardriveEmitter,
+    widgetHidden,
+    defaultAddress,
+    defaultArfsId,
+    lastTxCopy,
+    lastArfsIdCopy,
+    loadedArfsId,
+    loadedEntityType,
+  ])
 
   useEffect(() => {
     switch (theme) {
@@ -77,6 +132,7 @@ function Widget({
     if (defaultEntityId) {
       setArfsEntityId(new EntityID(defaultEntityId));
     }
+
   }, [theme, address, customArweave, defaultEntityId, defaultView]);
 
   useEffect(() => {
@@ -87,6 +143,36 @@ function Widget({
 
     setDrive(undefined);
   }, [arfsEntityId]);
+
+  function handleCallbacks() {
+    eventEmitter.on("HIDE_ARDRIVE_WIDGET", ()=> setHideWidget(true))
+    
+    if (eventEmitterCallback) {
+      eventEmitterCallback(eventEmitter)
+    }
+    if (widgetHiddenCallback) {
+      widgetHiddenCallback(!!widgetHidden)
+    }
+    if (defaultAddressCallback) {
+      defaultAddressCallback(arweaveAddress)
+    }
+    if (defaultEntityIdCallback) {
+      defaultEntityIdCallback(defaultArfsId, loadedEntityType!)
+    }
+    if (lastTxCopyCallback) {
+      lastTxCopyCallback(lastTxCopy)
+    }
+    if (lastArfsIdCopyCallback) {
+      lastArfsIdCopyCallback(lastArfsIdCopy)
+    }
+    if (loadedArfsIdCallback) {
+      loadedArfsIdCallback(loadedArfsId, loadedEntityType!)
+    }
+    if (loadedEntityTypeCallback) {
+      loadedEntityTypeCallback(loadedEntityType)
+    }
+
+  }
 
   async function updateDrive(id: EntityID) {
     try {
@@ -242,6 +328,7 @@ function Widget({
                     drive,
                   )}
                   fullScreen={fullScreen}
+                  hideOnCopy={hideOnCopy}
                 />
               ) : (
                 <></>
