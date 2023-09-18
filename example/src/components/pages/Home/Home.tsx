@@ -1,4 +1,5 @@
-import Widget from "../../../../../src/components/Widget";
+import ArdriveWidget from "ardrive-widget-react"
+import "ardrive-widget-react/styles.css?inline"
 import Search from "../../inputs/Search";
 import { useEffect, useState } from "react";
 import EventEmitter from "eventemitter3";
@@ -33,7 +34,7 @@ function Home() {
       }}
       
       >
-        <Widget
+        <ArdriveWidget
         preferredHideMode="icon"
         address={"7waR8v4STuwPnTck1zFVkQqJh5K9q9Zik4Y5-5dV7nk"}
         eventEmitterCallback={(emitter:any) => setArdriveEmitter(emitter)}

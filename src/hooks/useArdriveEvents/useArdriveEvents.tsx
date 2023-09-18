@@ -8,7 +8,7 @@ declare global {
 }
 
 // this holds the state of the events that have happened in the widget.
-function useArdriveEvents() {
+export function useArdriveEvents() {
 
   const [ardriveEmitter, setArdriveEmitter] = useState<EventEmitter>();
   const [widgetHidden, setWidgetHidden] = useState<boolean>();
@@ -68,5 +68,3 @@ function useArdriveEvents() {
     loadedEntityType,
   };
 }
-
-export default useArdriveEvents;

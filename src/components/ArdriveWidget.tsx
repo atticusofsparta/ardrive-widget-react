@@ -12,10 +12,10 @@ import CircleProgressBar from './progress/CircleProgressBar/CircleProgressBar';
 import { Files, Menu, Navbar, Search } from './views';
 import WidgetHidden from './views/WidgetHidden/WidgetHidden';
 import './styles.css'
-import useArdriveEvents from '../hooks/useArdriveEvents/useArdriveEvents';
+import {useArdriveEvents} from '../hooks/useArdriveEvents/useArdriveEvents';
 
 
-function Widget({
+function ArdriveWidget({
   theme = 'dark',
   customArweave,
   address,
@@ -398,4 +398,4 @@ function Widget({
   );
 }
 
-export default Widget;
+export default ArdriveWidget;

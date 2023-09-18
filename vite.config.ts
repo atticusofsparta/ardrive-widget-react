@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import svgr from 'vite-plugin-svgr';
+import dts from 'vite-plugin-dts';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,24 +13,27 @@ export default defineConfig({
     nodePolyfills({
       protocolImports: true,
     }),
+    dts({insertTypesEntry: true})
   ],
   build: {
+    outDir: 'dist',
+    sourcemap: true,
     lib: {
       // Could also be a dictionary or array of multiple entry points
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'ardrive-widget-react',
-      // the proper extensions will be added
-      fileName: 'ardrive-widget-react',
+      
+      entry: {
+        ArdriveWidget: resolve(__dirname, 'src/components/ArdriveWidget.tsx'), 
+        useArdriveEvents: resolve(__dirname, 'src/hooks/useArdriveEvents/useArdriveEvents.tsx')
+      },
+     formats: ['es', "cjs"],
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled
       // into your library
+      external: ['react'],
       output: {
         // Provide global variables to use in the UMD build
         // for externalized deps
-        globals: {
-          React: 'React',
-        },
       },
     },
   },
@@ -42,8 +46,6 @@ export default defineConfig({
       },
     },
   },
-  base: '/ardrive-widget-react/',
-
   resolve: {
     alias: {
       process: 'process/browser',
