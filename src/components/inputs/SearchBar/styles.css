@@ -1,0 +1,21 @@
+.searchBarContainer {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  min-height: 50px;
+  width: 100%;
+  border-radius: 6px;
+  background: white;
+  padding-right: 6px;
+  box-shadow: var(--shadow);
+}
+.searchBarContainer input {
+  box-sizing: border-box;
+  outline: none;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  border: none;
+  padding-left: 10px;
+}

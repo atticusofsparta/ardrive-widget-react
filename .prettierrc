@@ -4,7 +4,7 @@
   "trailingComma": "all",
   "singleQuote": true,
   "tabWidth": 2,
-  "endOfLine": "lf",
+  "endOfLine": "auto",
   "plugins": ["@trivago/prettier-plugin-sort-imports"],
   "importOrder": ["^[.{1,2}/]"],
   "importOrderSeparation": true,
