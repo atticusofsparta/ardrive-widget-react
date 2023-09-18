@@ -27,7 +27,6 @@ class ArweaveCompositeDataProvider implements ArFSDataProvider {
   }
 
   async buildDrive(drive: ArFSDriveEntity): Promise<ArFSDrive> {
-    
     const owner = await this._ArFSClient.getOwnerForDriveId(drive.driveId);
     const folders = await this._ArFSClient.getAllFoldersOfPublicDrive({
       driveId: drive.driveId,
@@ -50,17 +49,17 @@ class ArweaveCompositeDataProvider implements ArFSDataProvider {
       driveId: folder.driveId,
       owner,
     });
-  
+
     const folderID = folder.entityId;
     const allFolders = await this._ArFSClient.getAllFoldersOfPublicDrive({
       driveId: drive.driveId,
       owner: owner,
       latestRevisionsOnly: true,
     });
-  
+
     const filteredFolders: ArFSPublicFolder[] = [];
     const subFolderIDs: Set<EntityID> = new Set(); // To keep track of unique subfolder IDs
-  
+
     for (const f of allFolders) {
       if (f.parentFolderId.toString() === folderID.toString()) {
         filteredFolders.push(f);
@@ -70,26 +69,28 @@ class ArweaveCompositeDataProvider implements ArFSDataProvider {
         subFolderIDs.add(f.entityId);
       }
     }
-  
+
     const folderIDs = [...subFolderIDs, folderID];
-  
+
     const files = await this._ArFSClient.getPublicFilesWithParentFolderIds({
       folderIDs: folderIDs,
       owner,
       latestRevisionsOnly: true,
     });
-  
+
     return new ArFSDrive(drive, [...filteredFolders, folder], files);
   }
-  
 
   async buildDriveForFile(file: ArFSPublicFile): Promise<ArFSDrive> {
     const owner = await this._ArFSClient.getOwnerForDriveId(file.driveId);
     const drive = await this._ArFSClient.getPublicDrive({
       driveId: file.driveId,
-      owner
-    })
-    const folderId = file.parentFolderId.toString() === "root folder" ? drive.rootFolderId : file.parentFolderId;
+      owner,
+    });
+    const folderId =
+      file.parentFolderId.toString() === 'root folder'
+        ? drive.rootFolderId
+        : file.parentFolderId;
     const folder = await this._ArFSClient.getPublicFolder({
       folderId,
       owner,

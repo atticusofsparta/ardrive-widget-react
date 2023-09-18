@@ -21,7 +21,7 @@ function WidgetHidden({
       {mode === 'icon' ? (
         <button
           className="button white center"
-          style={{ border: 'none'}}
+          style={{ border: 'none' }}
           onClick={() => setHideWidget(false)}
         >
           <ArDriveStackIcon width={'18px'} height={'18px'} />
@@ -35,7 +35,9 @@ function WidgetHidden({
             setShowMenu={setShowMenu}
           />
         </div>
-      ) : <></>}
+      ) : (
+        <></>
+      )}
     </>
   );
 }

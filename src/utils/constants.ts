@@ -1,4 +1,5 @@
 import EventEmitter from 'eventemitter3';
+
 import { GqlResultTagArray, TagsObject } from '../types';
 
 export const ARFS_ID_REGEX = new RegExp(
@@ -51,7 +52,6 @@ export function tagsToObject({
   return tagObject;
 }
 
-
 export const eventEmitter = new EventEmitter();
 
 export enum WIDGET_EVENTS {
@@ -59,5 +59,5 @@ export enum WIDGET_EVENTS {
   HIDE = 'HIDE_ARDRIVE_WIDGET',
   TX_COPY = 'TX_COPY',
   ARFS_ID_COPY = 'ARFS_ID_COPY',
-  ENTITY_LOADED = 'ENTITY_LOADED' // type and id
+  ENTITY_LOADED = 'ENTITY_LOADED', // type and id
 }

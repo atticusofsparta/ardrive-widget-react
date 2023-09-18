@@ -9,7 +9,6 @@ declare global {
 
 // this holds the state of the events that have happened in the widget.
 export function useArdriveEvents() {
-
   const [ardriveEmitter, setArdriveEmitter] = useState<EventEmitter>();
   const [widgetHidden, setWidgetHidden] = useState<boolean>();
   const [defaultAddress, setdefaultAddress] = useState<string>();

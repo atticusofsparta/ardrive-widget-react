@@ -4,7 +4,7 @@ import {
   GitHubLogoIcon,
 } from '@radix-ui/react-icons';
 import * as Popover from '@radix-ui/react-popover';
-import { Button, Card, Section, Text } from '@radix-ui/themes';
+import { Button, Card, Text } from '@radix-ui/themes';
 import { Link } from 'react-router-dom';
 
 import Connect from '../buttons/Connect';
@@ -53,7 +53,7 @@ function SettingsPopover() {
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content className="flex flex-column card dark">
-          <a href="#">
+          <a href="/#/">
             <Text as="div" color="grass" size="2" weight="bold">
               Settings
             </Text>

@@ -7,7 +7,7 @@ function Search({
   submitCallback,
   onChangeCallback,
   style,
-  icon
+  icon,
 }: {
   style?: CSSProperties;
   submitCallback?: (query: string) => void;
@@ -59,16 +59,18 @@ function Search({
         radius="full"
       />
       <TextField.Slot>
-    { icon ? icon :
-        <Button
-          variant="ghost"
-          radius="full"
-          onClick={handleSearch}
-          style={{ marginRight: '1px' }}
-        >
-          <MagnifyingGlassIcon height="16" width="16" />
-        </Button>
-        }
+        {icon ? (
+          icon
+        ) : (
+          <Button
+            variant="ghost"
+            radius="full"
+            onClick={handleSearch}
+            style={{ marginRight: '1px' }}
+          >
+            <MagnifyingGlassIcon height="16" width="16" />
+          </Button>
+        )}
       </TextField.Slot>
     </TextField.Root>
   );

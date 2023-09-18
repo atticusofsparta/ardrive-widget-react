@@ -67,25 +67,24 @@ function useFilesTable(drive?: ArFSDrive) {
         title: 'Date',
         dataIndex: 'date',
         key: 'date',
-        render: (date: number) => { 
-
+        render: (date: number) => {
           return (
-          <div className="flex-column white" style={{ gap: '5px' }}>
-            <span style={{ fontSize: '12px' }}>
-              
-            </span>
-            <span style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>
-            {Intl.DateTimeFormat('en', {
-              year: 'numeric',
-              month: 'numeric',
-              day: '2-digit',
-            }).format(+date ?? Date.now())
-              .split('/')
-              .join('-')}{' '}
-              GMT
-            </span>
-          </div>
-        )},
+            <div className="flex-column white" style={{ gap: '5px' }}>
+              <span style={{ fontSize: '12px' }}></span>
+              <span style={{ fontSize: '12px', color: 'var(--text-subtle)' }}>
+                {Intl.DateTimeFormat('en', {
+                  year: 'numeric',
+                  month: 'numeric',
+                  day: '2-digit',
+                })
+                  .format(+date ?? Date.now())
+                  .split('/')
+                  .join('-')}{' '}
+                GMT
+              </span>
+            </div>
+          );
+        },
       },
       {
         title: '',

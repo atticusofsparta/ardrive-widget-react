@@ -200,13 +200,13 @@ function Search({
         entityTypeCallback(ENTITY_TYPES.FOLDER);
         entityIdCallback(result.folderId.entityId.toString());
         addressCallback(result.owner);
-        return
+        return;
       }
       if (Object.keys(result).includes('fileId')) {
         entityTypeCallback(ENTITY_TYPES.FILE);
         entityIdCallback(result.fileId.entityId.toString());
         addressCallback(result.owner);
-        return
+        return;
       }
       if (Object.keys(result).includes('driveId')) {
         entityTypeCallback(ENTITY_TYPES.DRIVE);
@@ -222,7 +222,11 @@ function Search({
     <>
       <div
         className="flex-column space-between fade-in"
-        style={{width: '100%', position: 'relative', height: fullScreen ? window.innerHeight * .75 : '350px', }}
+        style={{
+          width: '100%',
+          position: 'relative',
+          height: fullScreen ? window.innerHeight * 0.75 : '350px',
+        }}
       >
         <div className="flex-column gap" style={{ height: '100%' }}>
           {!searchResults ? (
@@ -293,7 +297,7 @@ function Search({
           <div
             className="white textLarge flex-column center gap scroll-container"
             style={{
-              height: fullScreen ? window.innerWidth * .5 : '275px',
+              height: fullScreen ? window.innerWidth * 0.5 : '275px',
               margin: '10px 0px',
               width: '100%',
               boxSizing: 'border-box',
@@ -342,9 +346,11 @@ function Search({
                     }}
                     scrollBarContainerStyle={{
                       right: '0px',
-                      top: fullScreen ? "130px" : '120px',
+                      top: fullScreen ? '130px' : '120px',
                     }}
-                    scrollBarContainerHeight={fullScreen ? window.innerHeight * .6 : 220}
+                    scrollBarContainerHeight={
+                      fullScreen ? window.innerHeight * 0.6 : 220
+                    }
                   >
                     {searchResults.map((result, index) => (
                       <button
@@ -384,9 +390,7 @@ function Search({
                 </span>
               )
             ) : (
-              <span
-                className="faded flex-column center"
-              >
+              <span className="faded flex-column center">
                 <CircleProgressBar size={80} color="var(--primary)" />
               </span>
             )}

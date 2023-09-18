@@ -44,13 +44,12 @@ export function formatByteCount(byteCount: number) {
   return `${count.toFixed(1)} ${byteCountTypes[typeIndex]}`;
 }
 
-
 export async function getCachedItemsByDriveId(driveId: string): Promise<any[]> {
   return new Promise<any[]>((resolve, reject) => {
     const dbOpenRequest = indexedDB.open('arfs-entity-cache-db', 1);
 
     dbOpenRequest.onerror = (_event: Event) => {
-      reject("Error opening database");
+      reject(`Error opening database ${JSON.stringify(_event)}`);
     };
 
     dbOpenRequest.onsuccess = (event: Event) => {
@@ -64,7 +63,6 @@ export async function getCachedItemsByDriveId(driveId: string): Promise<any[]> {
       cursorRequest.onsuccess = (event: Event) => {
         const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
         if (cursor) {
-         
           const itemDriveId = cursor.value.value.driveId?.entityId; // Assuming 'driveId' is an object with 'entityId'
           if (itemDriveId === driveId) {
             items.push(cursor.value);
@@ -76,7 +74,7 @@ export async function getCachedItemsByDriveId(driveId: string): Promise<any[]> {
       };
 
       cursorRequest.onerror = (_event: Event) => {
-        reject("Error querying by drive ID");
+        reject(`Error querying by drive ID ${JSON.stringify(_event)}`);
       };
     };
   });
@@ -92,11 +90,13 @@ export function decodeJsonDataUri(dataUri: string): any {
   // Validate Data URI scheme
   const schemePattern = /^data:application\/json;base64,/;
   if (!schemePattern.test(dataUri)) {
-    throw new Error("Invalid Data URI scheme. Must be 'data:application/json;base64,'");
+    throw new Error(
+      "Invalid Data URI scheme. Must be 'data:application/json;base64,'",
+    );
   }
 
   // Extract the Base64-encoded part
-  const base64String = dataUri.replace(schemePattern, "");
+  const base64String = dataUri.replace(schemePattern, '');
 
   // Decode the Base64 string
   const decodedString = atob(base64String);
@@ -110,12 +110,9 @@ export function decodeJsonDataUri(dataUri: string): any {
 }
 
 export function decodeStringDataUri(dataUri: string): any {
-  
   // Extract the Base64-encoded part
   const base64String = dataUri.split(',')[1];
 
   // Decode the Base64 string
   return atob(base64String);
-
 }
-

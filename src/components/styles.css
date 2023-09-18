@@ -43,10 +43,10 @@ button {
   padding: 5px;
   border-radius: 50%;
   cursor: pointer;
-  bottom:-40px;
+  bottom: -40px;
   right: -40px;
   border: none;
-  background:none;
+  background: none;
 }
 .full-screen-button:hover {
   box-shadow: var(--shadow);
@@ -234,7 +234,7 @@ button {
   fill: var(--text-subtle);
 }
 .rc-pagination-item-active {
-  color: var(--foreground-muted) !important; 
+  color: var(--foreground-muted) !important;
   fill: var(--foreground-muted) !important;
 }
 
@@ -243,7 +243,8 @@ button {
   fill: var(--primary) !important;
 }
 
-.rc-pagination-next:hover , .rc-pagination-prev:hover {
+.rc-pagination-next:hover,
+.rc-pagination-prev:hover {
   color: var(--primary);
   fill: var(--primary) !important;
   scale: 1.33 !important;

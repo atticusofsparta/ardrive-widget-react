@@ -18,7 +18,7 @@ function Files({
   // loadPercentage,
   startFolder,
   fullScreen,
-  hideOnCopy = false
+  hideOnCopy = false,
 }: {
   fullScreen: boolean;
   drive?: ArFSDrive;
@@ -52,8 +52,6 @@ function Files({
 
   function updateRows(rows: any[]) {
     const filteredRows = rows.filter((row) => {
-      if (row.entityType === 'folder' && row.folderId) {
-      }
       const parentFolderId = row.parentFolderId?.entityId?.toString();
       if (parentFolderId === 'root folder') {
         return false;
@@ -82,7 +80,7 @@ function Files({
   }
 
   function updateDrivePath(id: EntityID) {
-    let newPaths = [id];
+    const newPaths = [id];
     let parent = '';
     while (parent !== 'root folder') {
       parent =
@@ -205,7 +203,9 @@ function Files({
       className="flex-column"
       style={{
         position: 'relative',
-        height: fullScreen ? window.innerHeight - window.innerHeight * .25 : '350px',
+        height: fullScreen
+          ? window.innerHeight - window.innerHeight * 0.25
+          : '350px',
         width: '100%',
         justifyContent: 'flex-end',
       }}
@@ -287,7 +287,9 @@ function Files({
           scrollBarContainerStyle={
             paginatedFileData.length > 4 ? { top: '70px' } : { display: 'none' }
           }
-          scrollBarContainerHeight={fullScreen ? window.innerHeight * .65 : 260}
+          scrollBarContainerHeight={
+            fullScreen ? window.innerHeight * 0.65 : 260
+          }
         >
           <Table
             columns={fileColumns}
@@ -299,7 +301,9 @@ function Files({
               rowExpandable: () => true,
               expandRowByClick: true,
               expandedRowKeys: [expandedRowKey ?? ''],
-              expandedRowRender: (record) => <FileDetails row={record} hideOnCopy={hideOnCopy} />,
+              expandedRowRender: (record) => (
+                <FileDetails row={record} hideOnCopy={hideOnCopy} />
+              ),
             }}
             onRow={(record) => ({
               onClick: () => {

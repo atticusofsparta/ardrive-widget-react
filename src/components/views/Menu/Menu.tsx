@@ -14,7 +14,7 @@ function Menu({
   setShowMenu,
   view,
   setView,
-  fullScreen
+  fullScreen,
 }: {
   setShowMenu: Dispatch<SetStateAction<boolean>>;
   view: string;
@@ -24,9 +24,12 @@ function Menu({
   fullScreen: boolean;
 }) {
   return (
-    <div className="menu flex-column gap1" style={{
-      height: fullScreen ? window.innerHeight * .75 : 'auto',
-    }}>
+    <div
+      className="menu flex-column gap1"
+      style={{
+        height: fullScreen ? window.innerHeight * 0.75 : 'auto',
+      }}
+    >
       <button
         className="menuItem"
         onClick={() => {
